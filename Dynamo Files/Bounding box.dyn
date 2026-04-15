@@ -1,0 +1,275 @@
+{
+  "Uuid": "56b391a7-ae8e-45c8-b03d-5311b0225a2a",
+  "IsCustomNode": false,
+  "Description": "",
+  "Name": "Bounding box",
+  "ElementResolver": {
+    "ResolutionMap": {}
+  },
+  "Inputs": [],
+  "Outputs": [],
+  "Nodes": [
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "Code": "import clr\r\n\r\nimport sys\r\nsys.path.append('C:\\Program Files (x86)\\IronPython 2.7\\Lib')\r\n\r\nimport System\r\nfrom System.Collections.Generic import *\r\n\r\nclr.AddReference('ProtoGeometry')\r\nfrom Autodesk.DesignScript.Geometry import *\r\n\r\nclr.AddReference(\"RevitNodes\")\r\nimport Revit\r\nclr.ImportExtensions(Revit.Elements)\r\nclr.ImportExtensions(Revit.GeometryConversion)\r\nclr.AddReference(\"RevitServices\")\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager \r\nfrom RevitServices.Transactions import TransactionManager \r\n\r\nclr.AddReference(\"RevitAPI\")\r\nclr.AddReference(\"RevitAPIUI\")\r\n\r\nimport Autodesk \r\nfrom Autodesk.Revit.DB import *\r\nfrom Autodesk.Revit.UI import *\r\n\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\nuiapp = DocumentManager.Instance.CurrentUIApplication \r\napp = uiapp.Application \r\nuidoc = uiapp.ActiveUIDocument\r\n\r\ndef tolist(obj1):\r\n\tif isinstance(obj1,(list, tuple, set)): return obj1\r\n\telse: return [obj1]\r\n\r\n#Preparing input from dynamo to revit\r\nelement = UnwrapElement(IN[0])\r\n\r\n#Do some action in a Transaction\r\n\r\nTransactionManager.Instance.EnsureInTransaction(doc)\r\n\r\nlevel = FilteredElementCollector(doc).OfClass(Level).ToElements()\r\n\r\nviewtyps = FilteredElementCollector(doc).OfClass(ViewFamilyType).ToElements()\r\n\r\nthreeDViewTyp = [i for i in viewtyps if i.LookupParameter(\"Type Name\").AsString() == \"3D View\"][0]\r\n\r\n\r\n#newview = View3D.CreateIsometric (doc, threeDViewTyp.Id)\r\n#newview.Name = \"Sundar\"\r\n\r\n\r\nTransactionManager.Instance.TransactionTaskDone()\r\n\r\nOUT = threeDViewTyp",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "44358187802d423797b090ec20fc442e",
+      "NodeType": "PythonScriptNode",
+      "Inputs": [
+        {
+          "Id": "e2f215e66c8949d0815e202447f91a45",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "68bd7814005b4593b0fe158829ed709e",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    },
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "Code": "import clr\r\n\r\nimport sys\r\nsys.path.append('C:\\Program Files (x86)\\IronPython 2.7\\Lib')\r\n\r\nimport System\r\nfrom System.Collections.Generic import *\r\n\r\nclr.AddReference('ProtoGeometry')\r\nfrom Autodesk.DesignScript.Geometry import *\r\n\r\nclr.AddReference(\"RevitNodes\")\r\nimport Revit\r\nclr.ImportExtensions(Revit.Elements)\r\nclr.ImportExtensions(Revit.GeometryConversion)\r\nclr.AddReference(\"RevitServices\")\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager \r\nfrom RevitServices.Transactions import TransactionManager \r\n\r\nclr.AddReference(\"RevitAPI\")\r\nclr.AddReference(\"RevitAPIUI\")\r\n\r\nimport Autodesk \r\nfrom Autodesk.Revit.DB import *\r\nfrom Autodesk.Revit.UI import *\r\n\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\nuiapp = DocumentManager.Instance.CurrentUIApplication \r\napp = uiapp.Application \r\nuidoc = uiapp.ActiveUIDocument\r\n\r\ndef tolist(obj1):\r\n\tif isinstance(obj1,(list, tuple, set)): return obj1\r\n\telse: return [obj1]\r\n\r\n#Preparing input from dynamo to revit\r\nelements = tolist(UnwrapElement(IN[0]))\r\n\r\n#Do some action in a Transaction\r\n\r\nTransactionManager.Instance.EnsureInTransaction(doc)\r\n\r\ncats = List[BuiltInCategory]()\r\ncats.Add(BuiltInCategory.OST_CableTray)\r\ncats.Add(BuiltInCategory.OST_DuctCurves)\r\ncats.Add(BuiltInCategory.OST_PipeCurves)\r\ncats.Add(BuiltInCategory.OST_Walls)\r\n\r\ncatFilter = ElementMulticategoryFilter(cats)\r\n\r\novr = OverrideGraphicSettings()\r\novr.SetProjectionLineColor(Color(255,0,0))\r\n\r\nresult = []\r\n\r\nfor element in elements:\r\n    bb = element.get_BoundingBox(None)\r\n    min = bb.Min\r\n    max = bb.Max\r\n    ot = Outline(min, max)\r\n    bbFilter = BoundingBoxIntersectsFilter(ot)\r\n    \r\n    eleIds = List[ElementId]()\r\n    eleIds.Add(element.Id)\r\n    exclu = ExclusionFilter(eleIds)\r\n    fec = FilteredElementCollector(doc).WherePasses(exclu).WherePasses(bbFilter).WherePasses(catFilter).ToElements()\r\n    \r\n    #for i in fec:\r\n    #    doc.ActiveView.SetElementOverrides(i.Id, ovr)\r\n    \r\n    result.append([element,fec])\r\n\r\n\r\n\r\n\r\nTransactionManager.Instance.TransactionTaskDone()\r\n\r\nOUT = result",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "31b7bbebf11048e682453a691f9fbe29",
+      "NodeType": "PythonScriptNode",
+      "Inputs": [
+        {
+          "Id": "84590b6699db4d4aa83f779caaf5c0e4",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "877ed58c212240119863def51707e4c2",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    },
+    {
+      "ConcreteType": "Dynamo.Nodes.DSModelElementSelection, DSRevitNodesUI",
+      "NodeType": "ExtensionNode",
+      "InstanceId": [
+        "2d2f9aef-9ddb-4183-8116-9b35b6c27760-0004ddf0"
+      ],
+      "Id": "08b558e34fd547969ad8069d071fa89c",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "d0ebb63a40784b5f8571a5ad3a9ee768",
+          "Name": "Element",
+          "Description": "The selected elements.",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Select a model element from the document."
+    },
+    {
+      "ConcreteType": "Dynamo.Nodes.DSModelElementsSelection, DSRevitNodesUI",
+      "NodeType": "ExtensionNode",
+      "InstanceId": [
+        "2d2f9aef-9ddb-4183-8116-9b35b6c27760-0004ddf0",
+        "2d2f9aef-9ddb-4183-8116-9b35b6c27760-0004df88",
+        "2d2f9aef-9ddb-4183-8116-9b35b6c27760-0004df96"
+      ],
+      "Id": "2547e23c8d9f427a9f3fb73b478d09b0",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "294661db07034e869fac2ec1e34a01b4",
+          "Name": "Elements",
+          "Description": "The selected elements.",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Select multiple elements from the Revit document."
+    },
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "Code": "import clr\n\nclr.AddReference('RevitAPI')\nfrom Autodesk.Revit.DB import *\n\nclr.AddReference(\"RevitServices\")\nimport RevitServices\nfrom RevitServices.Persistence import DocumentManager\nfrom RevitServices.Transactions import TransactionManager\n\ndoc = DocumentManager.Instance.CurrentDBDocument\nview = doc.ActiveView\n\n# Get all walls in the active view\nwalls = FilteredElementCollector(doc, view.Id).OfCategory(BuiltInCategory.OST_Walls).WhereElementIsNotElementType().ToElements()\n\n# Define the color red (RGB 255, 0, 0)\ncolor_red = Color(255, 0, 0)\n\nTransactionManager.Instance.EnsureInTransaction(doc)\n\n# Create OverrideGraphicSettings for projection lines\noverride_settings = OverrideGraphicSettings()\noverride_settings.SetProjectionLineColor(color_red)\n\n# Create separate settings for surface if needed, or clear them if not wanted\n# For this request, we only want to change the projection line color.\n# If you also want to change the surface color to red, you would do:\n# override_settings.SetSurfaceForegroundPatternColor(color_red)\n\nfor wall in walls:\n    # Apply the override settings to the wall in the current view\n    view.SetElementOverrides(wall.Id, override_settings)\n\nTransactionManager.Instance.TransactionTaskDone()",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "2ed96b02b5b544908e508895f1f097bc",
+      "NodeType": "PythonScriptNode",
+      "Inputs": [
+        {
+          "Id": "af34b339cf3c4cb6896ae6baae232c90",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "73024c8a779c4a749f85130f8e2a2316",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    }
+  ],
+  "Connectors": [
+    {
+      "Start": "d0ebb63a40784b5f8571a5ad3a9ee768",
+      "End": "d903bd9493f744819ff32d5625661116",
+      "Id": "9f854e14993846e18bbefabfc8f4153f",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "294661db07034e869fac2ec1e34a01b4",
+      "End": "84590b6699db4d4aa83f779caaf5c0e4",
+      "Id": "03a3df9733cc49d092c910263a33c464",
+      "IsHidden": "False"
+    }
+  ],
+  "Dependencies": [],
+  "NodeLibraryDependencies": [],
+  "EnableLegacyPolyCurveBehavior": true,
+  "Thumbnail": "",
+  "GraphDocumentationURL": null,
+  "ExtensionWorkspaceData": [
+    {
+      "ExtensionGuid": "28992e1d-abb9-417f-8b1b-05e053bee670",
+      "Name": "Properties",
+      "Version": "3.3",
+      "Data": {}
+    },
+    {
+      "ExtensionGuid": "DFBD9CC0-DB40-457A-939E-8C8555555A9D",
+      "Name": "Generative Design",
+      "Version": "8.2",
+      "Data": {}
+    }
+  ],
+  "Author": "",
+  "Linting": {
+    "activeLinter": "None",
+    "activeLinterId": "7b75fb44-43fd-4631-a878-29f4d5d8399a",
+    "warningCount": 0,
+    "errorCount": 0
+  },
+  "Bindings": [],
+  "View": {
+    "Dynamo": {
+      "ScaleFactor": 1.0,
+      "HasRunWithoutCrash": true,
+      "IsVisibleInDynamoLibrary": true,
+      "Version": "3.3.0.6316",
+      "RunType": "Manual",
+      "RunPeriod": "1000"
+    },
+    "Camera": {
+      "Name": "_Background Preview",
+      "EyeX": -17.0,
+      "EyeY": 24.0,
+      "EyeZ": 50.0,
+      "LookX": 12.0,
+      "LookY": -13.0,
+      "LookZ": -58.0,
+      "UpX": 0.0,
+      "UpY": 1.0,
+      "UpZ": 0.0
+    },
+    "ConnectorPins": [],
+    "NodeViews": [
+      {
+        "Id": "44358187802d423797b090ec20fc442e",
+        "Name": "Python Script",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": -536.3637511888286,
+        "Y": 633.6942449682699
+      },
+      {
+        "Id": "31b7bbebf11048e682453a691f9fbe29",
+        "Name": "Python Script",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 101.69258595645692,
+        "Y": 568.6110497646097
+      },
+      {
+        "Id": "08b558e34fd547969ad8069d071fa89c",
+        "Name": "Select Model Element",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 228.25483658620607,
+        "Y": 202.76422093991647
+      },
+      {
+        "Id": "2547e23c8d9f427a9f3fb73b478d09b0",
+        "Name": "Select Model Elements",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": -192.7252050843086,
+        "Y": 824.1170469023348
+      },
+      {
+        "Id": "2ed96b02b5b544908e508895f1f097bc",
+        "Name": "AI code",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": true,
+        "ShowGeometry": true,
+        "X": 795.538428946864,
+        "Y": 336.7312363383434
+      }
+    ],
+    "Annotations": [],
+    "X": -1481.4766757554953,
+    "Y": -372.30214088055857,
+    "Zoom": 2.105808139186329
+  }
+}
