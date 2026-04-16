@@ -1,0 +1,151 @@
+{
+  "Uuid": "a7ae05ee-7527-4acc-852c-79bb3a1c2965",
+  "IsCustomNode": false,
+  "Description": "",
+  "Name": "Document operations",
+  "ElementResolver": {
+    "ResolutionMap": {}
+  },
+  "Inputs": [],
+  "Outputs": [],
+  "Nodes": [
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "Code": "import clr\r\n\r\nimport sys\r\nsys.path.append('C:\\Program Files (x86)\\IronPython 2.7\\Lib')\r\n\r\nimport System\r\nfrom System.Collections.Generic import *\r\n\r\nclr.AddReference('ProtoGeometry')\r\nfrom Autodesk.DesignScript.Geometry import *\r\n\r\nclr.AddReference(\"RevitNodes\")\r\nimport Revit\r\nclr.ImportExtensions(Revit.Elements)\r\nclr.ImportExtensions(Revit.GeometryConversion)\r\nclr.AddReference(\"RevitServices\")\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager \r\nfrom RevitServices.Transactions import TransactionManager \r\n\r\nclr.AddReference(\"RevitAPI\")\r\nclr.AddReference(\"RevitAPIUI\")\r\n\r\nimport Autodesk \r\nfrom Autodesk.Revit.DB import *\r\nfrom Autodesk.Revit.UI import *\r\n\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\nuiapp = DocumentManager.Instance.CurrentUIApplication \r\napp = uiapp.Application \r\nuidoc = uiapp.ActiveUIDocument\r\n\r\ndef tolist(obj1):\r\n\tif isinstance(obj1,(list, tuple, set)): return obj1\r\n\telse: return [obj1]\r\n\r\n#Preparing input from dynamo to revit\r\nelement = UnwrapElement(IN[0])\r\n\r\n#Do some action in a Transaction\r\n\"\"\"\r\nRvtlinks = FilteredElementCollector(doc).OfClass(RevitLinkInstance).ToElements()\r\nfor Rvtlink in Rvtlinks:\r\n    if \"Architectural\" in Rvtlink.Name:\r\n        linkfile = Rvtlink\r\n        break\r\n        \r\nlinkDoc = linkfile.GetLinkDocument()\r\n\"\"\"\r\n\r\npath = r\"C:\\Users\\Akryazz\\OneDrive\\Documents\\My Files\\Revit Api Training\\Python Revit API Training\\Revit Models\\2025\\MEP Model.rvt\"\r\n\r\nworkSharedPath = r\"C:\\Users\\Akryazz\\OneDrive\\Documents\\My Files\\Revit Api Training\\Python Revit API Training\\Revit Models\\2025\\Elec-Workshared.rvt\"\r\n\r\nmodelPath = FilePath(workSharedPath)\r\n\r\nopt = OpenOptions()\r\nopt.Audit = False\r\nopt.DetachFromCentralOption = DetachFromCentralOption.DoNotDetach\r\n\r\nwsDoc = app.OpenDocumentFile(modelPath, opt) \r\n\r\ncts = FilteredElementCollector(wsDoc).OfCategory(BuiltInCategory.OST_CableTray).WhereElementIsNotElementType().ToElements()\r\n\r\nTransactionManager.Instance.EnsureInTransaction(wsDoc)\r\nfor ct in cts:\r\n    ct.LookupParameter(\"Comments\").Set(\"Test my code\")\r\n\r\nTransactionManager.Instance.ForceCloseTransaction()\r\n\r\ntOpt = TransactWithCentralOptions()\r\nsOpt = SynchronizeWithCentralOptions()\r\n\r\nwsDoc.SynchronizeWithCentral(tOpt, sOpt)\r\nwsDoc.Close()\r\n\r\n\r\n\"\"\"\r\nmepDoc = app.OpenDocumentFile(path)\r\n\r\nducts = FilteredElementCollector(mepDoc).OfCategory(BuiltInCategory.OST_DuctCurves).WhereElementIsNotElementType().ToElements()\r\n\r\n\r\n\r\nductList = []\r\nfor duct in ducts:\r\n    duct.LookupParameter(\"Comments\").Set(\"21435213\")\r\n    comm = duct.LookupParameter(\"Comments\").AsString()\r\n    ductList.append(comm)\r\n\r\n\r\nTransactionManager.Instance.ForceCloseTransaction()\r\n\r\nmepDoc.Save()\r\nmepDoc.Close()\r\n\"\"\"\r\nOUT = ct",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "2e3335bfe34d4991b2934b16383bc231",
+      "NodeType": "PythonScriptNode",
+      "Inputs": [
+        {
+          "Id": "51c3bd936723432ebaf17ba3a9bd0cf1",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "c4e16a16ebd5422086e8f9d3689e243e",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    },
+    {
+      "ConcreteType": "Dynamo.Nodes.DSModelElementSelection, DSRevitNodesUI",
+      "NodeType": "ExtensionNode",
+      "InstanceId": [
+        "0a22d42a-5320-422b-9f0f-564d3de7bcf9-0004e483"
+      ],
+      "Id": "586748c2c12b456585c3f209a49a56dd",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "9c5b600996024fb2ae24938b4c5172a8",
+          "Name": "Element",
+          "Description": "The selected elements.",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Select a model element from the document."
+    }
+  ],
+  "Connectors": [
+    {
+      "Start": "9c5b600996024fb2ae24938b4c5172a8",
+      "End": "51c3bd936723432ebaf17ba3a9bd0cf1",
+      "Id": "700a230dad654f6ba3861581d9365552",
+      "IsHidden": "False"
+    }
+  ],
+  "Dependencies": [],
+  "NodeLibraryDependencies": [],
+  "EnableLegacyPolyCurveBehavior": true,
+  "Thumbnail": "",
+  "GraphDocumentationURL": null,
+  "ExtensionWorkspaceData": [
+    {
+      "ExtensionGuid": "28992e1d-abb9-417f-8b1b-05e053bee670",
+      "Name": "Properties",
+      "Version": "3.3",
+      "Data": {}
+    },
+    {
+      "ExtensionGuid": "DFBD9CC0-DB40-457A-939E-8C8555555A9D",
+      "Name": "Generative Design",
+      "Version": "8.2",
+      "Data": {}
+    }
+  ],
+  "Author": "",
+  "Linting": {
+    "activeLinter": "None",
+    "activeLinterId": "7b75fb44-43fd-4631-a878-29f4d5d8399a",
+    "warningCount": 0,
+    "errorCount": 0
+  },
+  "Bindings": [],
+  "View": {
+    "Dynamo": {
+      "ScaleFactor": 1.0,
+      "HasRunWithoutCrash": true,
+      "IsVisibleInDynamoLibrary": true,
+      "Version": "3.3.0.6316",
+      "RunType": "Manual",
+      "RunPeriod": "1000"
+    },
+    "Camera": {
+      "Name": "_Background Preview",
+      "EyeX": -17.0,
+      "EyeY": 24.0,
+      "EyeZ": 50.0,
+      "LookX": 12.0,
+      "LookY": -13.0,
+      "LookZ": -58.0,
+      "UpX": 0.0,
+      "UpY": 1.0,
+      "UpZ": 0.0
+    },
+    "ConnectorPins": [],
+    "NodeViews": [
+      {
+        "Id": "2e3335bfe34d4991b2934b16383bc231",
+        "Name": "Python Script",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 494.38454173640537,
+        "Y": 607.4506911165527
+      },
+      {
+        "Id": "586748c2c12b456585c3f209a49a56dd",
+        "Name": "Select Model Element",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 215.50423982222543,
+        "Y": 576.7114877232864
+      }
+    ],
+    "Annotations": [],
+    "X": -753.3475145400263,
+    "Y": -826.35177725455,
+    "Zoom": 1.899685115566627
+  }
+}
