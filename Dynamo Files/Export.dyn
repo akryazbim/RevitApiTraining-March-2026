@@ -1,0 +1,154 @@
+{
+  "Uuid": "97aa40bd-f711-4ecb-af22-e87c336c4376",
+  "IsCustomNode": false,
+  "Description": "",
+  "Name": "Export",
+  "ElementResolver": {
+    "ResolutionMap": {}
+  },
+  "Inputs": [],
+  "Outputs": [],
+  "Nodes": [
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "Code": "import clr\r\n\r\nimport sys\r\nsys.path.append('C:\\Program Files (x86)\\IronPython 2.7\\Lib')\r\n\r\nimport System\r\nfrom System.Collections.Generic import *\r\n\r\nclr.AddReference('ProtoGeometry')\r\nfrom Autodesk.DesignScript.Geometry import *\r\n\r\nclr.AddReference(\"RevitNodes\")\r\nimport Revit\r\nclr.ImportExtensions(Revit.Elements)\r\nclr.ImportExtensions(Revit.GeometryConversion)\r\nclr.AddReference(\"RevitServices\")\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager \r\nfrom RevitServices.Transactions import TransactionManager \r\n\r\nclr.AddReference(\"RevitAPI\")\r\nclr.AddReference(\"RevitAPIUI\")\r\n\r\nimport Autodesk \r\nfrom Autodesk.Revit.DB import *\r\nfrom Autodesk.Revit.UI import *\r\n\r\nimport os\r\nfrom pathlib import Path\r\n\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\nuiapp = DocumentManager.Instance.CurrentUIApplication \r\napp = uiapp.Application \r\nuidoc = uiapp.ActiveUIDocument\r\n\r\ndef tolist(obj1):\r\n\tif isinstance(obj1,(list, tuple, set)): return obj1\r\n\telse: return [obj1]\r\n\r\n#Preparing input from dynamo to revit\r\nelement = UnwrapElement(IN[0])\r\n\r\n#Do some action in a Transaction\r\n\r\n\"\"\"\r\npublic void Export(\r\n    string folder,\r\n    string name,\r\n    NavisworksExportOptions options\r\n)\r\n\"\"\"\r\nnwcOpt = NavisworksExportOptions()\r\nnwcOpt.ConvertElementProperties = True\r\nnwcOpt.ConvertLights = True\r\nnwcOpt.ConvertLinkedCADFormats = False\r\nnwcOpt.Coordinates = 0#NavisworksCoordinates.Internal\r\nnwcOpt.DivideFileIntoLevels = False\r\nnwcOpt.ExportElementIds = True\r\nnwcOpt.ExportScope = NavisworksExportScope.View\r\n#nwcOpt.ViewId = \r\n\r\n\"\"\"\r\npublic bool Export(\r\n    string folder,\r\n    string name,\r\n    ICollection<ElementId> views,\r\n    DWGExportOptions options\r\n)\"\"\"\r\n\r\n\r\ndwgOpt = DWGExportOptions()\r\ndwgOpt.MergedViews = True\r\n\r\npath = r\"C:\\Users\\Akryazz\\OneDrive\\Documents\\My Files\\Revit Api Training\\Python Revit API Training\\Working Files\\RevitApiTraining-March-2026\\Exports\"\r\n\r\n\r\nsheet = FilteredElementCollector(doc).OfClass(ViewSheet).FirstElement()\r\n\r\n#doc.Title+\"_\"+sheet.Name+\".dwg\"\r\nfileName = f\"{doc.Title}_{sheet.Name}.dwg\"\r\n\r\nsheetList = List[ElementId]()\r\nsheetList.Add(sheet.Id)\r\n\r\nfrom datetime import date\r\n\r\ntoday = date.today()\r\n\r\nfolderPath = r\"C:\\Users\\Akryazz\\OneDrive\\Documents\\My Files\\Revit Api Training\\Python Revit API Training\\Working Files\\RevitApiTraining-March-2026\\Exports\\Ishaque-\"+str(today)\r\n\r\nPath(folderPath).mkdir(parents=True, exist_ok=True)\r\n\r\n#doc.Export(folderPath, fileName, sheetList, dwgOpt)\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\nTransactionManager.Instance.EnsureInTransaction(doc)\r\n\r\nTransactionManager.Instance.TransactionTaskDone()\r\n\r\nOUT = OptionalFunctionalityUtils.IsNavisworksExporterAvailable()",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "f7e84fc453e94420a8cb39b961e90472",
+      "NodeType": "PythonScriptNode",
+      "Inputs": [
+        {
+          "Id": "a571b7fb41d34c5c82597b052597ef88",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "d49252f6a960498e8d822bf997433233",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    },
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "Code": "import clr\r\n\r\nimport sys\r\nsys.path.append('C:\\Program Files (x86)\\IronPython 2.7\\Lib')\r\n\r\nimport System\r\nfrom System.Collections.Generic import *\r\n\r\nclr.AddReference('ProtoGeometry')\r\nfrom Autodesk.DesignScript.Geometry import *\r\n\r\nclr.AddReference(\"RevitNodes\")\r\nimport Revit\r\nclr.ImportExtensions(Revit.Elements)\r\nclr.ImportExtensions(Revit.GeometryConversion)\r\nclr.AddReference(\"RevitServices\")\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager \r\nfrom RevitServices.Transactions import TransactionManager \r\n\r\nclr.AddReference(\"RevitAPI\")\r\nclr.AddReference(\"RevitAPIUI\")\r\n\r\nimport Autodesk \r\nfrom Autodesk.Revit.DB import *\r\nfrom Autodesk.Revit.DB.Mechanical import *\r\nfrom Autodesk.Revit.UI import *\r\n\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\nuiapp = DocumentManager.Instance.CurrentUIApplication \r\napp = uiapp.Application \r\nuidoc = uiapp.ActiveUIDocument\r\n\r\ndef tolist(obj1):\r\n\tif isinstance(obj1,(list, tuple, set)): return obj1\r\n\telse: return [obj1]\r\n\r\nrevitelements = UnwrapElement(IN[0])\r\n\r\n#Do some action in a Transaction\r\n\r\n\r\npath = r\"C:\\Users\\Akryazz\\OneDrive\\Documents\\My Files\\Revit Api Training\\Python Revit API Training\\Revit Models\\2025\\MEP Model.rvt\"\r\n\r\nmepdoc = app.OpenDocumentFile(path)\r\n\r\nducts = FilteredElementCollector(mepdoc).OfClass(Duct).ToElements()\r\n\r\nTransactionManager.Instance.EnsureInTransaction(mepdoc)\r\n\r\n\r\nductlist = []\r\nfor duct in ducts:\r\n    duct.LookupParameter(\"Comments\").Set(\"Updated by Python\")\r\n    comm = duct.LookupParameter(\"Comments\").AsString()\r\n    ductlist.append(comm)\r\n\r\nTransactionManager.Instance.ForceCloseTransaction()\r\n\r\nmepdoc.Save()\r\nmepdoc.Close()\r\n\r\n\r\nOUT = element",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "b61ba30da5a242a79bb69ac1eb3ed2ce",
+      "NodeType": "PythonScriptNode",
+      "Inputs": [
+        {
+          "Id": "ef1d51c56c5745cf93b1f5eee540e7ee",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "fac577e67bef42d7a7090fe60725284f",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    }
+  ],
+  "Connectors": [],
+  "Dependencies": [],
+  "NodeLibraryDependencies": [],
+  "EnableLegacyPolyCurveBehavior": true,
+  "Thumbnail": "",
+  "GraphDocumentationURL": null,
+  "ExtensionWorkspaceData": [
+    {
+      "ExtensionGuid": "28992e1d-abb9-417f-8b1b-05e053bee670",
+      "Name": "Properties",
+      "Version": "3.3",
+      "Data": {}
+    },
+    {
+      "ExtensionGuid": "DFBD9CC0-DB40-457A-939E-8C8555555A9D",
+      "Name": "Generative Design",
+      "Version": "8.2",
+      "Data": {}
+    }
+  ],
+  "Author": "",
+  "Linting": {
+    "activeLinter": "None",
+    "activeLinterId": "7b75fb44-43fd-4631-a878-29f4d5d8399a",
+    "warningCount": 0,
+    "errorCount": 0
+  },
+  "Bindings": [],
+  "View": {
+    "Dynamo": {
+      "ScaleFactor": 1.0,
+      "HasRunWithoutCrash": true,
+      "IsVisibleInDynamoLibrary": true,
+      "Version": "3.3.0.6316",
+      "RunType": "Manual",
+      "RunPeriod": "1000"
+    },
+    "Camera": {
+      "Name": "_Background Preview",
+      "EyeX": -17.0,
+      "EyeY": 24.0,
+      "EyeZ": 50.0,
+      "LookX": 12.0,
+      "LookY": -13.0,
+      "LookZ": -58.0,
+      "UpX": 0.0,
+      "UpY": 1.0,
+      "UpZ": 0.0
+    },
+    "ConnectorPins": [],
+    "NodeViews": [
+      {
+        "Id": "f7e84fc453e94420a8cb39b961e90472",
+        "Name": "Python Script",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 330.62887958127226,
+        "Y": 447.09767161529686
+      },
+      {
+        "Id": "b61ba30da5a242a79bb69ac1eb3ed2ce",
+        "Name": "Python Script",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 529.3968439956687,
+        "Y": 432.49097893970776
+      }
+    ],
+    "Annotations": [],
+    "X": -742.4719806795736,
+    "Y": -382.73788316530937,
+    "Zoom": 1.8150063437853636
+  }
+}
