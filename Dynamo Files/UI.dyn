@@ -1,0 +1,407 @@
+{
+  "Uuid": "7a7e6671-d2d2-4ea9-9464-b689b21d6174",
+  "IsCustomNode": false,
+  "Description": "",
+  "Name": "UI",
+  "ElementResolver": {
+    "ResolutionMap": {}
+  },
+  "Inputs": [],
+  "Outputs": [],
+  "Nodes": [
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "Code": "import clr\r\n\r\nimport sys\r\nsys.path.append('C:\\Program Files (x86)\\IronPython 2.7\\Lib')\r\n\r\nimport System\r\nfrom System.Collections.Generic import *\r\n\r\nclr.AddReference('ProtoGeometry')\r\nfrom Autodesk.DesignScript.Geometry import *\r\n\r\nclr.AddReference(\"RevitNodes\")\r\nimport Revit\r\nclr.ImportExtensions(Revit.Elements)\r\nclr.ImportExtensions(Revit.GeometryConversion)\r\n\r\nclr.AddReference(\"RevitServices\")\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager \r\nfrom RevitServices.Transactions import TransactionManager \r\n\r\nclr.AddReference(\"RevitAPI\")\r\nclr.AddReference(\"RevitAPIUI\")\r\n\r\nclr.AddReference('System.Windows.Forms')\r\nclr.AddReference('PresentationCore')\r\nclr.AddReference ('AdWindows')\r\n\r\n\r\nimport Autodesk.Windows as adwin\r\nfrom System.Windows.Media import RotateTransform\r\n\r\nimport Autodesk \r\nfrom Autodesk.Revit.DB import *\r\nfrom Autodesk.Revit.UI import *\r\n\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\nuiapp = DocumentManager.Instance.CurrentUIApplication \r\napp = uiapp.Application \r\nuidoc = uiapp.ActiveUIDocument\r\n\r\n\r\ndef tilt_ribbon (angle):\r\n    ribbon = adwin. ComponentManager.Ribbon \r\n    ribbon.RenderTransform = RotateTransform(angle)\r\n    return ribbon\r\n\r\n\r\nTransactionManager.Instance. EnsureInTransaction(doc)\r\nTransactionManager.Instance.TransactionTaskDone()\r\n\r\nOUT = tilt_ribbon(0)\r\n",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "77d176ddf4b3457584bfd1adf392002e",
+      "NodeType": "PythonScriptNode",
+      "Inputs": [
+        {
+          "Id": "a5ea1b657f5a43ecaf4f7f0ea15d9582",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "9be47396219e4d7abdc7be7f27d516d2",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    },
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "Code": "import clr\r\n\r\n# .NET references\r\nclr.AddReference('System.Windows.Forms')\r\nclr.AddReference('System.Drawing')\r\n\r\nfrom System.Windows.Forms import Form, Label, TextBox, NumericUpDown, TrackBar, CheckBox, Button, DialogResult\r\nfrom System.Drawing import Point, Size\r\nfrom System import Decimal\r\n\r\nclass SimpleForm(Form):\r\n    def __init__(self):\r\n        self.Text = \"User Input Form\"\r\n        self.Size = Size(800, 800)\r\n\r\n        # Name\r\n        self.labelName = Label()\r\n        self.labelName.Text = \"Name:\"\r\n        self.labelName.Location = Point(100, 20)\r\n\r\n        self.textName = TextBox()\r\n        self.textName.Location = Point(500, 20)\r\n        self.textName.Width = 150\r\n\r\n        # Age (NumericUpDown requires Decimal)\r\n        self.labelAge = Label()\r\n        self.labelAge.Text = \"Age:\"\r\n        self.labelAge.Location = Point(10, 60)\r\n\r\n        self.numAge = NumericUpDown()\r\n        self.numAge.Location = Point(120, 60)\r\n        self.numAge.Width = 60\r\n        self.numAge.Minimum = Decimal(0)\r\n        self.numAge.Maximum = Decimal(120)\r\n        self.numAge.Value = Decimal(25)\r\n\r\n        # Experience (Slider)\r\n        self.labelExp = Label()\r\n        self.labelExp.Text = \"Experience:\"\r\n        self.labelExp.Location = Point(10, 100)\r\n\r\n        self.sliderExp = TrackBar()\r\n        self.sliderExp.Location = Point(120, 90)\r\n        self.sliderExp.Width = 150\r\n        self.sliderExp.Minimum = 0\r\n        self.sliderExp.Maximum = 40\r\n        self.sliderExp.TickFrequency = 5\r\n        self.sliderExp.Value = 5\r\n\r\n        # Married checkbox\r\n        self.checkMarried = CheckBox()\r\n        self.checkMarried.Text = \"Married\"\r\n        self.checkMarried.Location = Point(120, 140)\r\n\r\n        # Submit Button\r\n        self.buttonSubmit = Button()\r\n        self.buttonSubmit.Text = \"Submit\"\r\n        self.buttonSubmit.Location = Point(100, 200)\r\n        self.buttonSubmit.Click += self.on_submit\r\n\r\n        # Add controls\r\n        self.Controls.Add(self.labelName)\r\n        self.Controls.Add(self.textName)\r\n        self.Controls.Add(self.labelAge)\r\n        self.Controls.Add(self.numAge)\r\n        self.Controls.Add(self.labelExp)\r\n        self.Controls.Add(self.sliderExp)\r\n        self.Controls.Add(self.checkMarried)\r\n        self.Controls.Add(self.buttonSubmit)\r\n\r\n        self.result = None\r\n\r\n    def on_submit(self, sender, args):\r\n        self.result = {\r\n            \"Name\": self.textName.Text,\r\n            \"Age\": int(self.numAge.Value),  # convert Decimal → int safely\r\n            \"Experience\": self.sliderExp.Value,\r\n            \"Married\": self.checkMarried.Checked\r\n        }\r\n        self.DialogResult = DialogResult.OK\r\n        self.Close()\r\n\r\n# Run form (modal)\r\nform = SimpleForm()\r\nform.ShowDialog()\r\n\r\nOUT = form.result",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "f940a7f2a1f84bdd90fdecf656a753fa",
+      "NodeType": "PythonScriptNode",
+      "Inputs": [
+        {
+          "Id": "4285ecd43bd5463e99359c8bf8edf68a",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "d981300ac4f1432083162f7c489de00f",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    },
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "Code": "import clr\r\n\r\nimport sys\r\nsys.path.append('C:\\Program Files (x86)\\IronPython 2.7\\Lib')\r\n\r\nimport System\r\nfrom System.Collections.Generic import *\r\n\r\nclr.AddReference('ProtoGeometry')\r\nfrom Autodesk.DesignScript.Geometry import *\r\n\r\nclr.AddReference(\"RevitNodes\")\r\nimport Revit\r\nclr.ImportExtensions(Revit.Elements)\r\nclr.ImportExtensions(Revit.GeometryConversion)\r\nclr.AddReference(\"RevitServices\")\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager \r\nfrom RevitServices.Transactions import TransactionManager \r\n\r\nclr.AddReference(\"RevitAPI\")\r\nclr.AddReference(\"RevitAPIUI\")\r\n\r\nimport Autodesk \r\nfrom Autodesk.Revit.DB import *\r\nfrom Autodesk.Revit.UI import *\r\n\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\nuiapp = DocumentManager.Instance.CurrentUIApplication \r\napp = uiapp.Application \r\nuidoc = uiapp.ActiveUIDocument\r\n\r\ndef tolist(obj1):\r\n\tif isinstance(obj1,(list, tuple, set)): return obj1\r\n\telse: return [obj1]\r\n\r\n#Preparing input from dynamo to revit\r\nelement = UnwrapElement(IN[0])\r\n\r\n#path1 = \"D:\\revit-practice-trails\\automation\\Project1.rvt\"\r\n#path2 = \"D:\\revit-practice-trails\\automation\\Project2.rvt\"\r\n#path3 = \"D:\\revit-practice-trails\\automation\\Project3.rvt\"\r\ndoc1 = r\"D:\\revit-practice-trails\\automation\\Project1.rvt\"\r\ndoc2 = r\"D:\\revit-practice-trails\\automation\\Project2.rvt\"\r\ndoc3 = r\"D:\\revit-practice-trails\\automation\\Project3.rvt\"\r\ndocNames = [doc1, doc2, doc3]\r\n\r\ndwgOpts = DWGExportOptions()\r\ndwgOpts.FileVersion=ACADVersion.R2018\r\ndwgOpts.MergedViews= False\r\n\r\nfor docName in docNames:\r\n    edoc = app.OpenDocumentFile(docName)\r\n\r\n    sheet = FilteredElementCollector(edoc).OfClass(ViewSheet).FirstElement()\r\n    \r\n    sheetList = List[ElementId]()\r\n    sheetList.Add(sheet.Id)\r\n    \r\n    filename = f\"{edoc.Title}_{sheet.Name}.dwg\"\r\n    \r\n    folderpath =r\"D:\\revit-practice-trails\\automation\\exports\"\r\n    \r\n    #doc.Export(folderpath, filename, sheetList, dwgOpts)\r\n    edoc.Close()\r\nTransactionManager.Instance.EnsureInTransaction(doc)\r\nTransactionManager.Instance.TransactionTaskDone()\r\n\r\nOUT = element",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "928bf7db7fd647ee87ec7a9da189bf21",
+      "NodeType": "PythonScriptNode",
+      "Inputs": [
+        {
+          "Id": "9e37730f9b784f8da659c4a6063f17c6",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "cb80797036a742dbb2b93cfac4d00e5c",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    },
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "Code": "import clr\r\n\r\nimport sys\r\nsys.path.append('C:\\Program Files (x86)\\IronPython 2.7\\Lib')\r\n\r\nimport System\r\nfrom System.Collections.Generic import *\r\n\r\nclr.AddReference('ProtoGeometry')\r\nfrom Autodesk.DesignScript.Geometry import *\r\n\r\nclr.AddReference(\"RevitNodes\")\r\nimport Revit\r\nclr.ImportExtensions(Revit.Elements)\r\nclr.ImportExtensions(Revit.GeometryConversion)\r\nclr.AddReference(\"RevitServices\")\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager \r\nfrom RevitServices.Transactions import TransactionManager \r\n\r\nclr.AddReference(\"RevitAPI\")\r\nclr.AddReference(\"RevitAPIUI\")\r\n\r\nimport Autodesk \r\nfrom Autodesk.Revit.DB import *\r\nfrom Autodesk.Revit.UI import TaskDialog\r\n\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\nuiapp = DocumentManager.Instance.CurrentUIApplication \r\napp = uiapp.Application \r\nuidoc = uiapp.ActiveUIDocument\r\n\r\ndef tolist(obj1):\r\n\tif isinstance(obj1,(list, tuple, set)): return obj1\r\n\telse: return [obj1]\r\n\r\n#Preparing input from dynamo to revit\r\nelement = UnwrapElement(IN[0])\r\n\r\n#Do some action in a Transaction\r\n\r\n\r\nwalls = FilteredElementCollector(doc).OfClass(Wall).ToElements()\r\n\r\n#TaskDialog.Show(\"Welcome\", \"No. of walls = \"+str(len(walls)))\r\n\r\n\r\nTransactionManager.Instance.EnsureInTransaction(doc)\r\n\r\nTransactionManager.Instance.TransactionTaskDone()\r\n\r\nOUT = element",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "98cfe1d168f84c17ae7e9d63522ad888",
+      "NodeType": "PythonScriptNode",
+      "Inputs": [
+        {
+          "Id": "002b8f56535541ba9b8165c449a0e310",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "ed6ac580b8e14090978ee4e8bcab5584",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    },
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "Code": "import clr\r\n\r\nimport sys\r\nsys.path.append('C:\\Program Files (x86)\\IronPython 2.7\\Lib')\r\n\r\nimport System\r\nfrom System.Collections.Generic import *\r\n\r\nclr.AddReference('ProtoGeometry')\r\nfrom Autodesk.DesignScript.Geometry import *\r\n\r\nclr.AddReference(\"RevitNodes\")\r\nimport Revit\r\nclr.ImportExtensions(Revit.Elements)\r\nclr.ImportExtensions(Revit.GeometryConversion)\r\nclr.AddReference(\"RevitServices\")\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager \r\nfrom RevitServices.Transactions import TransactionManager \r\n\r\nclr.AddReference(\"RevitAPI\")\r\nclr.AddReference(\"RevitAPIUI\")\r\n\r\nimport Autodesk \r\nfrom Autodesk.Revit.DB import *\r\nfrom Autodesk.Revit.UI import *\r\nfrom Autodesk.Revit.UI.Selection import *\r\n\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\nuiapp = DocumentManager.Instance.CurrentUIApplication \r\napp = uiapp.Application \r\nuidoc = uiapp.ActiveUIDocument\r\n\r\ndef tolist(obj1):\r\n\tif isinstance(obj1,(list, tuple, set)): return obj1\r\n\telse: return [obj1]\r\n\r\n#Preparing input from dynamo to revit\r\nelement = UnwrapElement(IN[0])\r\n\r\n#Do some action in a Transaction\r\n\r\nselectedIds = uidoc.Selection.GetElementIds()\r\n\r\n\"\"\"\r\nresult = []\r\n\r\nfor selectedId in selectedIds:\r\n    ele = doc.GetElement(selectedId)\r\n    result.append(ele.Name)\r\n\"\"\"\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\"\"\"public void SetElementIds(\r\n    ICollection<ElementId> elementIds\r\n)\"\"\"\r\n\r\n\r\nwalls = FilteredElementCollector(doc).OfClass(Wall).ToElements()\r\n\r\nids = List[ElementId]()\r\n\r\nfor wall in walls:\r\n    id = wall.Id\r\n    ids.Add(id)\r\n    \r\n\r\n#uidoc.Selection.SetElementIds(ids)\r\n\r\n\"\"\"\r\nTaskDialog.Show(\"Prompt\", \"Now select elements in Revit screen\")\r\nslectedIds = uidoc.Selection.PickElementsByRectangle(\"Pick Elements - User Hint\")\r\nTaskDialog.Show(\"Prompt\", \"Selection over\")\r\n\"\"\"\r\n\r\n\"\"\"\r\nselectedRefs = uidoc.Selection.PickObjects(ObjectType.Element)\r\neles = []\r\nfor i in selectedRefs:\r\n    ele = doc.GetElement(i.ElementId)\r\n    eles.append(ele)\r\n    \r\n\r\n#eles = [doc.GetElement(i.ElementId) for i in eles]\r\n\r\n\"\"\"\r\n\r\n#linkiedEle = uidoc.Selection.PickObject(ObjectType.LinkedElement)\r\n\r\n\r\nclass CustomFilter(ISelectionFilter):\r\n    def __init__(self):\r\n        super(CustomFilter, self).__init__()\r\n\r\n    def AllowElement(self, element):\r\n        try:\r\n            return element.Category.Name == \"Walls\"\r\n        except:\r\n            return False\r\n\r\n    def AllowReference(self, reference, point):\r\n        return False\r\n\r\n#filt = CustomFilter()\r\n\r\n\r\n\r\n#selectedElements = uidoc.Selection.PickElementsByRectangle(filt)\r\n\r\n\r\n\r\n\r\n\r\n\r\nTransactionManager.Instance.EnsureInTransaction(doc)\r\n\r\nTransactionManager.Instance.TransactionTaskDone()\r\n\r\nOUT = selectedElements\r\n",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "e9478a82c10d45b08a67ad4ef9ae256e",
+      "NodeType": "PythonScriptNode",
+      "Inputs": [
+        {
+          "Id": "230dbe02c15642609f57f8d2d20f9a4b",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "58bd95f58ff44bc8a1a51447c4d86277",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    },
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "Code": "import clr\r\n\r\nimport sys\r\nsys.path.append('C:\\Program Files (x86)\\IronPython 2.7\\Lib')\r\n\r\nimport System\r\nfrom System.Collections.Generic import *\r\n\r\nclr.AddReference('ProtoGeometry')\r\nfrom Autodesk.DesignScript.Geometry import *\r\n\r\nclr.AddReference(\"RevitNodes\")\r\nimport Revit\r\nclr.ImportExtensions(Revit.Elements)\r\nclr.ImportExtensions(Revit.GeometryConversion)\r\nclr.AddReference(\"RevitServices\")\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager \r\nfrom RevitServices.Transactions import TransactionManager \r\n\r\nclr.AddReference(\"RevitAPI\")\r\nclr.AddReference(\"RevitAPIUI\")\r\n\r\nimport Autodesk \r\nfrom Autodesk.Revit.DB import *\r\nfrom Autodesk.Revit.UI import *\r\n\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\nuiapp = DocumentManager.Instance.CurrentUIApplication \r\napp = uiapp.Application \r\nuidoc = uiapp.ActiveUIDocument\r\n\r\ndef tolist(obj1):\r\n\tif isinstance(obj1,(list, tuple, set)): return obj1\r\n\telse: return [obj1]\r\n\r\n#Preparing input from dynamo to revit\r\nwall = UnwrapElement(IN[0])\r\nnewType = UnwrapElement(IN[1])\r\n\r\n#Do some action in a Transaction\r\n\r\nTransactionManager.Instance.EnsureInTransaction(doc)\r\n\r\n#wall.WallType = newType\r\n\r\n\r\nTransactionManager.Instance.TransactionTaskDone()\r\n\r\nOUT = wall",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "5f6017fc307b4fbab903d458a833cf38",
+      "NodeType": "PythonScriptNode",
+      "Inputs": [
+        {
+          "Id": "95fce03f48b741099c47270cde162dec",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "8ccd1b42bb51409a95e882c8bc94f7c8",
+          "Name": "IN[1]",
+          "Description": "Input #1",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "18bb847cbc4549feb68784e8ab9ebb41",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    },
+    {
+      "ConcreteType": "Dynamo.Nodes.DSModelElementSelection, DSRevitNodesUI",
+      "NodeType": "ExtensionNode",
+      "InstanceId": [
+        "2d2f9aef-9ddb-4183-8116-9b35b6c27760-0004df96"
+      ],
+      "Id": "67d2fa93905b418e8e5934ba107c7263",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "a32607ccb92a49c792b8daa30ff94fb2",
+          "Name": "Element",
+          "Description": "The selected elements.",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Select a model element from the document."
+    },
+    {
+      "ConcreteType": "DSRevitNodesUI.WallTypes, DSRevitNodesUI",
+      "SelectedIndex": 0,
+      "SelectedString": "Concrete Wall",
+      "Id": "b86042058467436698ab041f88433a20",
+      "NodeType": "ExtensionNode",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "89b9eaab58b64458887d2784810d2aca",
+          "Name": "Wall Type",
+          "Description": "The selected Wall Type",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "All wall types available in the document."
+    }
+  ],
+  "Connectors": [
+    {
+      "Start": "a32607ccb92a49c792b8daa30ff94fb2",
+      "End": "95fce03f48b741099c47270cde162dec",
+      "Id": "8c36c404cc4b42b19a8c6ca6d19b7f75",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "89b9eaab58b64458887d2784810d2aca",
+      "End": "8ccd1b42bb51409a95e882c8bc94f7c8",
+      "Id": "b8b3a9ab737a47e3ad7474d152dfb944",
+      "IsHidden": "False"
+    }
+  ],
+  "Dependencies": [],
+  "NodeLibraryDependencies": [],
+  "EnableLegacyPolyCurveBehavior": true,
+  "Thumbnail": "",
+  "GraphDocumentationURL": null,
+  "ExtensionWorkspaceData": [
+    {
+      "ExtensionGuid": "28992e1d-abb9-417f-8b1b-05e053bee670",
+      "Name": "Properties",
+      "Version": "3.3",
+      "Data": {}
+    },
+    {
+      "ExtensionGuid": "DFBD9CC0-DB40-457A-939E-8C8555555A9D",
+      "Name": "Generative Design",
+      "Version": "8.2",
+      "Data": {}
+    }
+  ],
+  "Author": "",
+  "Linting": {
+    "activeLinter": "None",
+    "activeLinterId": "7b75fb44-43fd-4631-a878-29f4d5d8399a",
+    "warningCount": 0,
+    "errorCount": 0
+  },
+  "Bindings": [],
+  "View": {
+    "Dynamo": {
+      "ScaleFactor": 1.0,
+      "HasRunWithoutCrash": true,
+      "IsVisibleInDynamoLibrary": true,
+      "Version": "3.3.0.6316",
+      "RunType": "Manual",
+      "RunPeriod": "1000"
+    },
+    "Camera": {
+      "Name": "_Background Preview",
+      "EyeX": -17.0,
+      "EyeY": 24.0,
+      "EyeZ": 50.0,
+      "LookX": 12.0,
+      "LookY": -13.0,
+      "LookZ": -58.0,
+      "UpX": 0.0,
+      "UpY": 1.0,
+      "UpZ": 0.0
+    },
+    "ConnectorPins": [],
+    "NodeViews": [
+      {
+        "Id": "77d176ddf4b3457584bfd1adf392002e",
+        "Name": "Python Script",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": true,
+        "ShowGeometry": true,
+        "X": 184.48994925321176,
+        "Y": 379.04083633735297
+      },
+      {
+        "Id": "f940a7f2a1f84bdd90fdecf656a753fa",
+        "Name": "WinForm Demo",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": true,
+        "ShowGeometry": true,
+        "X": 160.5285403410647,
+        "Y": 187.8190121927923
+      },
+      {
+        "Id": "928bf7db7fd647ee87ec7a9da189bf21",
+        "Name": "Shaik code",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": true,
+        "ShowGeometry": true,
+        "X": 130.94664064753272,
+        "Y": 804.7082037064023
+      },
+      {
+        "Id": "98cfe1d168f84c17ae7e9d63522ad888",
+        "Name": "Python Script",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 211.9087808694262,
+        "Y": 538.1975075627051
+      },
+      {
+        "Id": "e9478a82c10d45b08a67ad4ef9ae256e",
+        "Name": "Python Script",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 560.3198749607814,
+        "Y": 607.6354407753857
+      },
+      {
+        "Id": "5f6017fc307b4fbab903d458a833cf38",
+        "Name": "Python Script",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 1302.7351230465931,
+        "Y": 578.1682492526943
+      },
+      {
+        "Id": "67d2fa93905b418e8e5934ba107c7263",
+        "Name": "Select Model Element",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 909.6120991702934,
+        "Y": 532.3357472399257
+      },
+      {
+        "Id": "b86042058467436698ab041f88433a20",
+        "Name": "Wall Types",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 926.8906381523695,
+        "Y": 685.2261285473211
+      }
+    ],
+    "Annotations": [],
+    "X": -1346.3448994358043,
+    "Y": -447.74875822682634,
+    "Zoom": 1.4438960813541417
+  }
+}
