@@ -1,0 +1,408 @@
+{
+  "Uuid": "88e1d9be-df71-455e-a1b7-12714542c37d",
+  "IsCustomNode": false,
+  "Description": "",
+  "Name": "Raytrace",
+  "ElementResolver": {
+    "ResolutionMap": {}
+  },
+  "Inputs": [],
+  "Outputs": [],
+  "Nodes": [
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "Code": "import clr\r\n\r\nimport sys\r\nsys.path.append('C:\\Program Files (x86)\\IronPython 2.7\\Lib')\r\n\r\nimport System\r\nfrom System.Collections.Generic import *\r\n\r\nclr.AddReference('ProtoGeometry')\r\nfrom Autodesk.DesignScript.Geometry import *\r\n\r\nclr.AddReference(\"RevitNodes\")\r\nimport Revit\r\nclr.ImportExtensions(Revit.Elements)\r\nclr.ImportExtensions(Revit.GeometryConversion)\r\nclr.AddReference(\"RevitServices\")\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager \r\nfrom RevitServices.Transactions import TransactionManager \r\n\r\nclr.AddReference(\"RevitAPI\")\r\nclr.AddReference(\"RevitAPIUI\")\r\n\r\nimport Autodesk \r\nfrom Autodesk.Revit.DB import *\r\nfrom Autodesk.Revit.UI import *\r\n\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\nuiapp = DocumentManager.Instance.CurrentUIApplication \r\napp = uiapp.Application \r\nuidoc = uiapp.ActiveUIDocument\r\n\r\ndef tolist(obj1):\r\n\tif isinstance(obj1,(list, tuple, set)): return obj1\r\n\telse: return [obj1]\r\n\r\n#Preparing input from dynamo to revit\r\nelement = UnwrapElement(IN[0])\r\n\r\n#Do some action in a Transaction\r\n\"\"\"\r\nTransactionManager.Instance.EnsureInTransaction(doc)\r\n\r\nTaskDialog.Show(\"Prompt\",\"Now select Revit Links only from the current view\")\r\n\r\neles = uidoc.Selection.PickObjects(ObjectType.Element)\r\n#selectrefs = uidoc.Selection.PickObjects(ObjectType.Element)\r\n#ele = [doc.GetElement(i.ElementId) for i in selectrefs]\r\n#lnkname = lnkele.Name\r\n\r\n\r\n#ids = List[ElementId]()\r\nlnkname = []\r\nductss = []\r\nfor lnkele in eles:\r\n    linkInstance = doc.GetElement(lnkele)\r\n    if isinstance(linkInstance, RevitLinkInstance):\r\n        if linkInstance:\r\n            linkdoc = linkInstance.GetLinkDocument()\r\n            ducts = FilteredElementCollector(linkdoc).OfCategory(BuiltInCategory.OST_DuctCurves).WhereElementIsNotElementType().ToElements()\r\n            ductss.append(ducts)\r\n            #for duct in ducts:\r\n                #id = duct.Id\r\n                #ids.Add(id)\r\n            lnknme = linkdoc.Title\r\n            lnkname.append(lnknme)\r\n    else:\r\n        lnkname = \"Selected element is not a Revit Link Instance\"\r\n\r\n\r\n#uidoc.Selection.SetElementIds(ids)\r\n\r\nTransactionManager.Instance.TransactionTaskDone()\r\n\r\n\"\"\"\r\nviews = FilteredElementCollector(doc).OfClass(View3D)\r\n\r\nview = []\r\nfor v in views:\r\n    if v.Name == \"Sundar\":\r\n        viewn = v\r\n        view.append(viewn)\r\n        filename = v.Name+\".nwc\"\r\n        break\r\n\"\"\"\r\nviewcls = List[ElementId]()\r\nfor vi in view:\r\n    viewcls.Add(vi.Id)\r\n\"\"\"\r\npath = r\"C:\\Users\\Asus\\Downloads\\DYNAMO TRAINING\\LEVEL 02 - PYTHON\\Export\\NWC\"\r\n\r\nnwcOpt = NavisworksExportOptions()\r\n\r\nnwcOpt.ExportLinks = True\r\nnwcOpt.ExportRoomAsAttribute = True\r\nnwcOpt.ExportRoomGeometry = True\r\nnwcOpt.ConvertElementProperties = True\r\nnwcOpt.ConvertLights = True\r\nnwcOpt.ConvertLinkedCADFormats = False\r\nnwcOpt.DivideFileIntoLevels = False\r\nnwcOpt.Coordinates = 0#NavisworksCoordinates.Internal\r\nnwcOpt.ExportElementIds = True\r\nnwcOpt.ExportScope = NavisworksExportScope.View\r\nnwcOpt.ViewId = doc.ActiveView.Id\r\n\r\n\r\n#doc.Export(path, \"Test.nwc\", nwcOpt)\r\n\r\n#OUT = \"Exported sucessfully\" if result else \"Not Exported\"\r\n\r\n\r\nOUT = nwcOpt",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "a77963c90b35448d9bc604193ce014d3",
+      "NodeType": "PythonScriptNode",
+      "Inputs": [
+        {
+          "Id": "a516ca10ecb14915a90bb49714024c97",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "c2d622fc3847496ba72a42118cf26c85",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    },
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "Code": "import clr\r\n\r\nimport sys\r\nsys.path.append('C:\\Program Files (x86)\\IronPython 2.7\\Lib')\r\n\r\nimport System\r\nfrom System.Collections.Generic import *\r\n\r\nclr.AddReference('ProtoGeometry')\r\nfrom Autodesk.DesignScript.Geometry import *\r\n\r\nclr.AddReference(\"RevitNodes\")\r\nimport Revit\r\nclr.ImportExtensions(Revit.Elements)\r\nclr.ImportExtensions(Revit.GeometryConversion)\r\nclr.AddReference(\"RevitServices\")\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager \r\nfrom RevitServices.Transactions import TransactionManager \r\n\r\nclr.AddReference(\"RevitAPI\")\r\nclr.AddReference(\"RevitAPIUI\")\r\n\r\nimport Autodesk \r\nfrom Autodesk.Revit.DB import *\r\nfrom Autodesk.Revit.UI import *\r\n\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\nuiapp = DocumentManager.Instance.CurrentUIApplication \r\napp = uiapp.Application \r\nuidoc = uiapp.ActiveUIDocument\r\n\r\ndef tolist(obj1):\r\n\tif isinstance(obj1,(list, tuple, set)): return obj1\r\n\telse: return [obj1]\r\n\r\n#Preparing input from dynamo to revit\r\nelement = UnwrapElement(IN[0])\r\n\r\n# Opening external document and saving as dwg\r\n\r\nextPath = r\"F:\\BIM ERA_AUTOMATION\\Level-2_Revit Api and Python\\Test file.rvt\"\r\n\r\n\r\n# Collecting first sheet from the CURRENT document\r\n\r\nsheet = FilteredElementCollector(doc)\\\r\n            .OfClass(ViewSheet)\\\r\n            .FirstElement()\r\n\r\n\r\nfileName = \"Test file.dwg\"\r\n\r\n# Date\r\n\r\nfrom datetime import date\r\nfrom pathlib import Path\r\n\r\ntoday      = date.today()\r\nfolderPath = r\"F:\\BIM ERA_AUTOMATION\\Level-2_Revit Api and Python\\Test file\"\r\nPath(folderPath).mkdir(parents=True, exist_ok=True)\r\n\r\n# DWG export \r\n\r\ndwgOpt = DWGExportOptions()            \r\n\r\n# Sheet list \r\n\r\nsheetList = List[ElementId]()\r\nsheetList.Add(sheet.Id)\r\n\r\n#doc.Export(folderPath, fileName, sheetList, dwgOpt)\r\n\r\n\r\nTransactionManager.Instance.EnsureInTransaction(doc) \r\n\r\n\r\nTransactionManager.Instance.TransactionTaskDone()\r\n\r\n# True = Exported, False = Not Exported\r\n\r\nOUT = range(100,501,100)",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "52cffbc1dea9450e90ebac6062a5c4aa",
+      "NodeType": "PythonScriptNode",
+      "Inputs": [
+        {
+          "Id": "0ed228664c24434a85aa9453c9712cc8",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "23a35e75ab634dbdae445a980f9efdfa",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    },
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "Code": "import clr\r\n\r\nimport sys\r\nsys.path.append('C:\\Program Files (x86)\\IronPython 2.7\\Lib')\r\n\r\nimport System\r\nfrom System.Collections.Generic import *\r\n\r\nclr.AddReference('ProtoGeometry')\r\nfrom Autodesk.DesignScript.Geometry import *\r\n\r\nclr.AddReference(\"RevitNodes\")\r\nimport Revit\r\nclr.ImportExtensions(Revit.Elements)\r\nclr.ImportExtensions(Revit.GeometryConversion)\r\nclr.AddReference(\"RevitServices\")\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager \r\nfrom RevitServices.Transactions import TransactionManager \r\n\r\nclr.AddReference(\"RevitAPI\")\r\nclr.AddReference(\"RevitAPIUI\")\r\n\r\nimport Autodesk \r\nfrom Autodesk.Revit.DB import *\r\nfrom Autodesk.Revit.UI import *\r\n\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\nuiapp = DocumentManager.Instance.CurrentUIApplication \r\napp = uiapp.Application \r\nuidoc = uiapp.ActiveUIDocument\r\n\r\ndef tolist(obj1):\r\n\tif isinstance(obj1,(list, tuple, set)): return obj1\r\n\telse: return [obj1]\r\n\r\n#Preparing input from dynamo to revit\r\nelement = UnwrapElement(IN[0])\r\n\r\n#Do some action in a Transaction\r\n\r\nTransactionManager.Instance.EnsureInTransaction(doc)\r\n\r\nTransactionManager.Instance.TransactionTaskDone()\r\n\r\n\r\nauthor = \"Dnyan\"\r\n\r\n# input from Dynamo\r\ninput_elements = FilteredElementCollector(doc).OfClass(RevitLinkInstance).ToElements()\r\n\r\n# Output List\r\nelement_names    = []\r\nelement_ids      = []\r\nelement_cats     = []\r\nlinked_doc_names = []\r\n\r\n\r\nfor elem in input_elements:\r\n    try:\r\n        unwrapped = UnwrapElement(elem)\r\n\r\n        if unwrapped is None:\r\n            continue\r\n\r\n# Link Instance \r\n        if isinstance(unwrapped, RevitLinkInstance):\r\n\r\n            linked_doc = unwrapped.GetLinkDocument()\r\n            if linked_doc is None:\r\n                continue\r\n\r\n        # Collect all elements from linked doc\r\n            elements = FilteredElementCollector(linked_doc)\\\r\n                        .WhereElementIsNotElementType()\\\r\n                        .ToElements()\r\n\r\n            for linked_element in elements:\r\n                try:\r\n                    type_id   = linked_element.GetTypeId()\r\n                    elem_type = linked_doc.GetElement(type_id)\r\n                    name = elem_type.Name if elem_type else linked_element.Name\r\n                except:\r\n                    name = linked_element.Name if hasattr(linked_element, 'Name') else \"Unnamed\"\r\n\r\n                cat = linked_element.Category.Name if linked_element.Category else \"No Category\"\r\n\r\n                element_names.append(name)\r\n                element_ids.append(linked_element.Id.IntegerValue)\r\n                element_cats.append(cat)\r\n                linked_doc_names.append(linked_doc.Title)\r\n        else:\r\n            try:\r\n                type_id   = unwrapped.GetTypeId()\r\n                elem_type = doc.GetElement(type_id)\r\n                name = elem_type.Name if elem_type else unwrapped.Name\r\n            except:\r\n                name = unwrapped.Name if hasattr(unwrapped, 'Name') else \"Unnamed\"\r\n\r\n            cat = unwrapped.Category.Name if unwrapped.Category else \"No Category\"\r\n\r\n            element_names.append(name)\r\n            element_ids.append(unwrapped.Id.IntegerValue)\r\n            element_cats.append(cat)\r\n            linked_doc_names.append(doc.Title)\r\n\r\n    except:\r\n        pass\r\n\r\n# Output\r\nOUT = element_names, element_ids, element_cats, linked_doc_names, author\r\n",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "3638fdaf3b034e5a93d1113fe37fd9c2",
+      "NodeType": "PythonScriptNode",
+      "Inputs": [
+        {
+          "Id": "9c8b5b941c714a1f80901d669970fe6d",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "f6005c9c3c0341df8380a3888dd0de7c",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    },
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "Code": "import clr\r\n\r\nimport sys\r\nsys.path.append('C:\\Program Files (x86)\\IronPython 2.7\\Lib')\r\n\r\nimport System\r\nfrom System.Collections.Generic import *\r\n\r\nclr.AddReference('ProtoGeometry')\r\nfrom Autodesk.DesignScript.Geometry import *\r\n\r\nclr.AddReference(\"RevitNodes\")\r\nimport Revit\r\nclr.ImportExtensions(Revit.Elements)\r\nclr.ImportExtensions(Revit.GeometryConversion)\r\nclr.AddReference(\"RevitServices\")\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager \r\nfrom RevitServices.Transactions import TransactionManager \r\n\r\nclr.AddReference(\"RevitAPI\")\r\nclr.AddReference(\"RevitAPIUI\")\r\n\r\nimport Autodesk \r\nfrom Autodesk.Revit.DB import *\r\nfrom Autodesk.Revit.UI import *\r\n\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\nuiapp = DocumentManager.Instance.CurrentUIApplication \r\napp = uiapp.Application \r\nuidoc = uiapp.ActiveUIDocument\r\n\r\ndef tolist(obj1):\r\n\tif isinstance(obj1,(list, tuple, set)): return obj1\r\n\telse: return [obj1]\r\n\r\n#Preparing input from dynamo to revit\r\nelement = UnwrapElement(IN[0])\r\n\r\n#Do some action in a Transaction\r\n\r\nelements = FilteredElementCollector(doc).OfClass(Wall)\\\r\n    .WhereElementIsNotElementType()\\\r\n    .ToElements()\r\n\r\n# Store (name, element) pairs\r\nelement_data = []\r\n\r\nfor ele in elements:\r\n    try:\r\n        name = ele.Name\r\n    except:\r\n        name = \"Unnamed Element\"\r\n\r\n    element_data.append((name, ele))\r\n\r\n# Sort by name\r\nsorted_data = sorted(element_data, key=lambda x: x[0])\r\n\r\n# Separate sorted names and elements\r\nsorted_names = [x[0] for x in sorted_data]\r\nsorted_elements = [x[1] for x in sorted_data]\r\nTransactionManager.Instance.EnsureInTransaction(doc)\r\n\r\nTransactionManager.Instance.TransactionTaskDone()\r\n\r\n\r\nOUT = sorted_elements, sorted_names\r\n\r\n\r\n\r\n\r\n\r\n\r\n",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "0970501564754c5c98aebb30027f3b99",
+      "NodeType": "PythonScriptNode",
+      "Inputs": [
+        {
+          "Id": "a5414e6949494db9a044b789b806444c",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "d0bb8e2a1444464faaaf2e80caffd859",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    },
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "Code": "import clr\r\n\r\nimport sys\r\nsys.path.append('C:\\Program Files (x86)\\IronPython 2.7\\Lib')\r\n\r\nimport System\r\nfrom System.Collections.Generic import *\r\n\r\nclr.AddReference('ProtoGeometry')\r\nfrom Autodesk.DesignScript.Geometry import *\r\n\r\nclr.AddReference(\"RevitNodes\")\r\nimport Revit\r\nclr.ImportExtensions(Revit.Elements)\r\nclr.ImportExtensions(Revit.GeometryConversion)\r\nclr.AddReference(\"RevitServices\")\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager \r\nfrom RevitServices.Transactions import TransactionManager \r\n\r\nclr.AddReference(\"RevitAPI\")\r\nclr.AddReference(\"RevitAPIUI\")\r\n\r\nimport Autodesk \r\nfrom Autodesk.Revit.DB import *\r\nfrom Autodesk.Revit.UI import *\r\n\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\nuiapp = DocumentManager.Instance.CurrentUIApplication \r\napp = uiapp.Application \r\nuidoc = uiapp.ActiveUIDocument\r\n\r\ndef tolist(obj1):\r\n\tif isinstance(obj1,(list, tuple, set)): return obj1\r\n\telse: return [obj1]\r\n\r\n#Preparing input from dynamo to revit\r\ndl = UnwrapElement(IN[0])\r\ndl1 = UnwrapElement(IN[1])\r\n\r\n#Do some action in a Transaction\r\n\"\"\"\r\npublic ReferenceIntersector(\r\n    ElementFilter filter,\r\n    FindReferenceTarget targetType,\r\n    View3D view3d\r\n)\r\n\r\npublic ReferenceWithContext FindNearest(\r\n    XYZ origin,\r\n    XYZ direction\r\n)\"\"\"\r\n\r\n\r\nview3Ds = FilteredElementCollector(doc).OfClass(View3D).ToElements()\r\nsundarView = [i for i in view3Ds if i.Name == \"Sundar\"][0]\r\n\r\ncatFilter = ElementCategoryFilter(BuiltInCategory.OST_Walls)\r\n\r\nri = ReferenceIntersector(catFilter, FindReferenceTarget.Element, sundarView)\r\n\r\nloc = dl.Location.Curve\r\norigin = loc.Origin\r\n\r\nnewOrgin = XYZ(origin.X, origin.Y, origin.Z+(6000/304.8))\r\n\r\n\r\nsp = loc.GetEndPoint(0)\r\nep = loc.GetEndPoint(1)\r\n\r\ndiff = ep.Subtract(sp).Normalize()\r\n\r\nvec = XYZ(0.0000001,0,0)\r\n\r\n\r\n\r\nrwc = ri.FindNearest(loc.Origin, loc.Direction)\r\nrefer = rwc.GetReference()\r\nele = doc.GetElement(refer)\r\ndist = rwc.Proximity*304.8\r\npt = refer.GlobalPoint.ToPoint()\r\n\r\n\r\neleList = []\r\ndistList = []\r\nptList = []\r\n\r\nrwcs = ri.Find(newOrgin, vec)\r\nfor rwc in rwcs:\r\n    refer = rwc.GetReference()\r\n    ele = doc.GetElement(refer)\r\n    eleList.append(ele)\r\n    \r\n    dist = round(rwc.Proximity*304.8)\r\n    distList.append(dist)\r\n    \r\n    pt = refer.GlobalPoint.ToPoint()\r\n    ptList.append(pt)\r\n    \r\n    \r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\nTransactionManager.Instance.EnsureInTransaction(doc)\r\n\r\nTransactionManager.Instance.TransactionTaskDone()\r\n\r\nOUT = eleList, distList, ptList",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "2142431e82c340fe95a0592c4acdfe9c",
+      "NodeType": "PythonScriptNode",
+      "Inputs": [
+        {
+          "Id": "e46184cfedd34583922b5fc835b07ffb",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "b4ccf80d33b54a24afd272c461515077",
+          "Name": "IN[1]",
+          "Description": "Input #1",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "db0ac8ce0b7e48069fda70095d3249c0",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    },
+    {
+      "ConcreteType": "Dynamo.Nodes.DSModelElementSelection, DSRevitNodesUI",
+      "NodeType": "ExtensionNode",
+      "InstanceId": [
+        "415feb8f-5392-4764-b8cf-5c5352a1a0af-0004e5f2"
+      ],
+      "Id": "784173357c40437993115fce22711c42",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "e31b0b6b21044728907386ad7f429a50",
+          "Name": "Element",
+          "Description": "The selected elements.",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Select a model element from the document."
+    },
+    {
+      "ConcreteType": "Dynamo.Nodes.DSModelElementSelection, DSRevitNodesUI",
+      "NodeType": "ExtensionNode",
+      "InstanceId": [
+        "415feb8f-5392-4764-b8cf-5c5352a1a0af-0004eb60"
+      ],
+      "Id": "07fd0440ccbf4f3b94d8c31d819c20a7",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "44eb46cede524d4db5ff977a846d4c37",
+          "Name": "Element",
+          "Description": "The selected elements.",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Select a model element from the document."
+    },
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "Code": "import clr\r\n\r\nimport sys\r\nsys.path.append('C:\\Program Files (x86)\\IronPython 2.7\\Lib')\r\n\r\nimport System\r\nfrom System.Collections.Generic import *\r\n\r\nclr.AddReference('ProtoGeometry')\r\nfrom Autodesk.DesignScript.Geometry import *\r\n\r\nclr.AddReference(\"RevitNodes\")\r\nimport Revit\r\nclr.ImportExtensions(Revit.Elements)\r\nclr.ImportExtensions(Revit.GeometryConversion)\r\nclr.AddReference(\"RevitServices\")\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager \r\nfrom RevitServices.Transactions import TransactionManager \r\n\r\nclr.AddReference(\"RevitAPI\")\r\nclr.AddReference(\"RevitAPIUI\")\r\n\r\nimport Autodesk \r\nfrom Autodesk.Revit.DB import *\r\nfrom Autodesk.Revit.DB.Structure import *\r\nfrom Autodesk.Revit.UI import *\r\n\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\nuiapp = DocumentManager.Instance.CurrentUIApplication \r\napp = uiapp.Application \r\nuidoc = uiapp.ActiveUIDocument\r\n\r\ndef tolist(obj1):\r\n\tif isinstance(obj1,(list, tuple, set)): return obj1\r\n\telse: return [obj1]\r\n\r\n#Preparing input from dynamo to revit\r\ndl = UnwrapElement(IN[0])\r\n\r\n#Do some action in a Transaction\r\n\r\nview3Ds = FilteredElementCollector(doc).OfClass(View3D).ToElements()\r\nsundarView = [i for i in view3Ds if i.Name == \"Sundar\"][0]\r\n\r\ncatFilter = ElementCategoryFilter(BuiltInCategory.OST_Ceilings)\r\n\r\nri = ReferenceIntersector(catFilter, FindReferenceTarget.Element, sundarView)\r\n\r\nloc = dl.Location.Curve\r\norigin = loc.Center\r\n\r\ndir = XYZ(0,0,1)\r\n\r\nrwc = ri.FindNearest(origin, dir)\r\nrefer = rwc.GetReference()\r\nele = doc.GetElement(refer)\r\ndist = rwc.Proximity*304.8\r\npt = refer.GlobalPoint\r\n\r\n\r\n\"\"\"\r\npublic FamilyInstance NewFamilyInstance(\r\n    XYZ location,\r\n    FamilySymbol symbol,\r\n    Element host,\r\n    Level level,\r\n    StructuralType structuralType\r\n)\"\"\"\r\n\r\n\r\nfs = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_LightingFixtures).WhereElementIsElementType().FirstElement()\r\n\r\nlevel = doc.GetElement(ele.LevelId)\r\n\r\n\r\n\r\n\r\n\r\n\r\nTransactionManager.Instance.EnsureInTransaction(doc)\r\n\r\n\r\nnewFixture = doc.Create.NewFamilyInstance(pt, fs, ele, level, StructuralType.NonStructural)\r\n\r\n\r\nTransactionManager.Instance.TransactionTaskDone()\r\n\r\nOUT = newFixture",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "8ce9a47f76ec4e15aa347122bfe514eb",
+      "NodeType": "PythonScriptNode",
+      "Inputs": [
+        {
+          "Id": "86604d35f193475f92d2ef15442b20d2",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "4497a62294fa402b8a3fa4c473469798",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    }
+  ],
+  "Connectors": [
+    {
+      "Start": "e31b0b6b21044728907386ad7f429a50",
+      "End": "e46184cfedd34583922b5fc835b07ffb",
+      "Id": "1620e2d7ec344b8b8be8fc82b07a0b7f",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "44eb46cede524d4db5ff977a846d4c37",
+      "End": "86604d35f193475f92d2ef15442b20d2",
+      "Id": "f01a983390f54e3d9609a06a73021a8a",
+      "IsHidden": "False"
+    }
+  ],
+  "Dependencies": [],
+  "NodeLibraryDependencies": [],
+  "EnableLegacyPolyCurveBehavior": true,
+  "Thumbnail": "",
+  "GraphDocumentationURL": null,
+  "ExtensionWorkspaceData": [
+    {
+      "ExtensionGuid": "28992e1d-abb9-417f-8b1b-05e053bee670",
+      "Name": "Properties",
+      "Version": "3.3",
+      "Data": {}
+    },
+    {
+      "ExtensionGuid": "DFBD9CC0-DB40-457A-939E-8C8555555A9D",
+      "Name": "Generative Design",
+      "Version": "8.2",
+      "Data": {}
+    }
+  ],
+  "Author": "",
+  "Linting": {
+    "activeLinter": "None",
+    "activeLinterId": "7b75fb44-43fd-4631-a878-29f4d5d8399a",
+    "warningCount": 0,
+    "errorCount": 0
+  },
+  "Bindings": [],
+  "View": {
+    "Dynamo": {
+      "ScaleFactor": 1.0,
+      "HasRunWithoutCrash": true,
+      "IsVisibleInDynamoLibrary": true,
+      "Version": "3.3.0.6316",
+      "RunType": "Manual",
+      "RunPeriod": "1000"
+    },
+    "Camera": {
+      "Name": "_Background Preview",
+      "EyeX": -17.0,
+      "EyeY": 24.0,
+      "EyeZ": 50.0,
+      "LookX": 12.0,
+      "LookY": -13.0,
+      "LookZ": -58.0,
+      "UpX": 0.0,
+      "UpY": 1.0,
+      "UpZ": 0.0
+    },
+    "ConnectorPins": [],
+    "NodeViews": [
+      {
+        "Id": "a77963c90b35448d9bc604193ce014d3",
+        "Name": "Sundar",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": true,
+        "ShowGeometry": true,
+        "X": 348.6962296020214,
+        "Y": 304.89420703648693
+      },
+      {
+        "Id": "52cffbc1dea9450e90ebac6062a5c4aa",
+        "Name": "Python Script",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": true,
+        "ShowGeometry": true,
+        "X": 369.6363572635146,
+        "Y": 76.45733087384224
+      },
+      {
+        "Id": "3638fdaf3b034e5a93d1113fe37fd9c2",
+        "Name": "Dnyan",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": true,
+        "ShowGeometry": true,
+        "X": 341.0561933534521,
+        "Y": 450.5877493796852
+      },
+      {
+        "Id": "0970501564754c5c98aebb30027f3b99",
+        "Name": "Sort elements by name",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": true,
+        "ShowGeometry": true,
+        "X": 619.0500707748696,
+        "Y": 134.4064308639816
+      },
+      {
+        "Id": "2142431e82c340fe95a0592c4acdfe9c",
+        "Name": "Python Script",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 1159.5971571776774,
+        "Y": 76.79661269622602
+      },
+      {
+        "Id": "784173357c40437993115fce22711c42",
+        "Name": "Select Model Element",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 856.8600272022308,
+        "Y": -2.395944482424028
+      },
+      {
+        "Id": "07fd0440ccbf4f3b94d8c31d819c20a7",
+        "Name": "Select Model Element",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 1216.8112937226392,
+        "Y": -430.9946277905509
+      },
+      {
+        "Id": "8ce9a47f76ec4e15aa347122bfe514eb",
+        "Name": "Python Script",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 1504.784379332738,
+        "Y": -388.87501701704025
+      }
+    ],
+    "Annotations": [],
+    "X": -1846.6065950581424,
+    "Y": 1138.7069304491304,
+    "Zoom": 1.402738539830084
+  }
+}
