@@ -1,0 +1,15 @@
+C:\Users\Akryazz\OneDrive\Documents\My Files\Revit Api Training\Python Revit API Training\repo\RevitApiTraining-March-2026\C-sharp\bin\Debug\net8.0\C-sharp.exe
+C:\Users\Akryazz\OneDrive\Documents\My Files\Revit Api Training\Python Revit API Training\repo\RevitApiTraining-March-2026\C-sharp\bin\Debug\net8.0\C-sharp.deps.json
+C:\Users\Akryazz\OneDrive\Documents\My Files\Revit Api Training\Python Revit API Training\repo\RevitApiTraining-March-2026\C-sharp\bin\Debug\net8.0\C-sharp.runtimeconfig.json
+C:\Users\Akryazz\OneDrive\Documents\My Files\Revit Api Training\Python Revit API Training\repo\RevitApiTraining-March-2026\C-sharp\bin\Debug\net8.0\C-sharp.dll
+C:\Users\Akryazz\OneDrive\Documents\My Files\Revit Api Training\Python Revit API Training\repo\RevitApiTraining-March-2026\C-sharp\bin\Debug\net8.0\C-sharp.pdb
+C:\Users\Akryazz\OneDrive\Documents\My Files\Revit Api Training\Python Revit API Training\repo\RevitApiTraining-March-2026\C-sharp\obj\Debug\net8.0\C-sharp.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Akryazz\OneDrive\Documents\My Files\Revit Api Training\Python Revit API Training\repo\RevitApiTraining-March-2026\C-sharp\obj\Debug\net8.0\C-sharp.AssemblyInfoInputs.cache
+C:\Users\Akryazz\OneDrive\Documents\My Files\Revit Api Training\Python Revit API Training\repo\RevitApiTraining-March-2026\C-sharp\obj\Debug\net8.0\C-sharp.AssemblyInfo.cs
+C:\Users\Akryazz\OneDrive\Documents\My Files\Revit Api Training\Python Revit API Training\repo\RevitApiTraining-March-2026\C-sharp\obj\Debug\net8.0\C-sharp.csproj.CoreCompileInputs.cache
+C:\Users\Akryazz\OneDrive\Documents\My Files\Revit Api Training\Python Revit API Training\repo\RevitApiTraining-March-2026\C-sharp\obj\Debug\net8.0\C-sharp.sourcelink.json
+C:\Users\Akryazz\OneDrive\Documents\My Files\Revit Api Training\Python Revit API Training\repo\RevitApiTraining-March-2026\C-sharp\obj\Debug\net8.0\C-sharp.dll
+C:\Users\Akryazz\OneDrive\Documents\My Files\Revit Api Training\Python Revit API Training\repo\RevitApiTraining-March-2026\C-sharp\obj\Debug\net8.0\refint\C-sharp.dll
+C:\Users\Akryazz\OneDrive\Documents\My Files\Revit Api Training\Python Revit API Training\repo\RevitApiTraining-March-2026\C-sharp\obj\Debug\net8.0\C-sharp.pdb
+C:\Users\Akryazz\OneDrive\Documents\My Files\Revit Api Training\Python Revit API Training\repo\RevitApiTraining-March-2026\C-sharp\obj\Debug\net8.0\C-sharp.genruntimeconfig.cache
+C:\Users\Akryazz\OneDrive\Documents\My Files\Revit Api Training\Python Revit API Training\repo\RevitApiTraining-March-2026\C-sharp\obj\Debug\net8.0\ref\C-sharp.dll

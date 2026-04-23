@@ -1,0 +1,112 @@
+{
+  "Uuid": "51c1f46b-cbb6-40cf-b0de-5325ac35cede",
+  "IsCustomNode": false,
+  "Description": "",
+  "Name": "c#",
+  "ElementResolver": {
+    "ResolutionMap": {}
+  },
+  "Inputs": [],
+  "Outputs": [],
+  "Nodes": [
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "Code": "import clr\r\n\r\n# Revit API\r\nclr.AddReference('RevitAPI')\r\nclr.AddReference('RevitServices')\r\n\r\nfrom Autodesk.Revit.DB import *\r\nfrom RevitServices.Persistence import DocumentManager\r\nfrom RevitServices.Transactions import TransactionManager\r\n\r\n# Document\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\n\r\n# Inputs from Dynamo\r\nelements = UnwrapElement(IN[0])\r\nview = UnwrapElement(IN[1])\r\n\r\n# -----------------------------\r\n# CHANGE THIS BASED ON ELEMENT\r\n# -----------------------------\r\ntagCategory = BuiltInCategory.OST_WallTags   # Change if needed\r\n\r\n# -----------------------------\r\n# GET TAG FAMILY TYPE\r\n# -----------------------------\r\ntagSymbols = FilteredElementCollector(doc)\\\r\n    .OfClass(FamilySymbol)\\\r\n    .OfCategory(tagCategory)\\\r\n    .ToElements()\r\n    \r\n\r\nif not tagSymbols:\r\n    OUT = \"❌ No tag family loaded for this category\"\r\nelse:\r\n    tagType = tagSymbols[0]\r\n\r\n    # Activate tag type if needed\r\n    if not tagType.IsActive:\r\n        TransactionManager.Instance.EnsureInTransaction(doc)\r\n        tagType.Activate()\r\n        TransactionManager.Instance.TransactionTaskDone()\r\n\r\n    # -----------------------------\r\n    # CREATE TAGS\r\n    # -----------------------------\r\n    TransactionManager.Instance.EnsureInTransaction(doc)\r\n\r\n    count = 0\r\n    failed = 0\r\n\r\n    for elem in elements:\r\n        try:\r\n            if elem is None:\r\n                continue\r\n\r\n            loc = elem.Location\r\n\r\n            # Get placement point\r\n            if isinstance(loc, LocationCurve):\r\n                point = loc.Curve.Evaluate(0.5, True)\r\n            elif isinstance(loc, LocationPoint):\r\n                point = loc.Point\r\n            else:\r\n                failed += 1\r\n                continue\r\n\r\n            # Create reference\r\n            refer = Reference(elem)\r\n            if refer is None:\r\n                failed += 1\r\n                continue\r\n\r\n            # Create tag\r\n            tag = IndependentTag.Create(\r\n                doc,\r\n                tagType.Id,   # IMPORTANT FIX\r\n                view.Id,\r\n                refer,\r\n                False,\r\n                TagOrientation.Horizontal,\r\n                point\r\n            )\r\n\r\n            if tag:\r\n                count += 1\r\n            else:\r\n                failed += 1\r\n\r\n        except:\r\n            failed += 1\r\n\r\n    TransactionManager.Instance.TransactionTaskDone()\r\n\r\n    OUT = \"✅ Tags created: {} | ❌ Failed: {}\".format(count, failed)\"\"\"",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "302583cc22b546b99caae28058ba7515",
+      "NodeType": "PythonScriptNode",
+      "Inputs": [
+        {
+          "Id": "825bbb3c0bda4853baeab0da8b41c4f8",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "7c39211416ab49f48d8cdfc439bd1834",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    }
+  ],
+  "Connectors": [],
+  "Dependencies": [],
+  "NodeLibraryDependencies": [],
+  "EnableLegacyPolyCurveBehavior": null,
+  "Thumbnail": "",
+  "GraphDocumentationURL": null,
+  "ExtensionWorkspaceData": [
+    {
+      "ExtensionGuid": "28992e1d-abb9-417f-8b1b-05e053bee670",
+      "Name": "Properties",
+      "Version": "3.3",
+      "Data": {}
+    },
+    {
+      "ExtensionGuid": "DFBD9CC0-DB40-457A-939E-8C8555555A9D",
+      "Name": "Generative Design",
+      "Version": "8.2",
+      "Data": {}
+    }
+  ],
+  "Author": "",
+  "Linting": {
+    "activeLinter": "None",
+    "activeLinterId": "7b75fb44-43fd-4631-a878-29f4d5d8399a",
+    "warningCount": 0,
+    "errorCount": 0
+  },
+  "Bindings": [],
+  "View": {
+    "Dynamo": {
+      "ScaleFactor": 1.0,
+      "HasRunWithoutCrash": true,
+      "IsVisibleInDynamoLibrary": true,
+      "Version": "3.3.0.6316",
+      "RunType": "Manual",
+      "RunPeriod": "1000"
+    },
+    "Camera": {
+      "Name": "_Background Preview",
+      "EyeX": -17.0,
+      "EyeY": 24.0,
+      "EyeZ": 50.0,
+      "LookX": 12.0,
+      "LookY": -13.0,
+      "LookZ": -58.0,
+      "UpX": 0.0,
+      "UpY": 1.0,
+      "UpZ": 0.0
+    },
+    "ConnectorPins": [],
+    "NodeViews": [
+      {
+        "Id": "302583cc22b546b99caae28058ba7515",
+        "Name": "Subash code",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 383.31227332821805,
+        "Y": 210.145256736302
+      }
+    ],
+    "Annotations": [],
+    "X": -102.96986877897541,
+    "Y": -5.540402457098764,
+    "Zoom": 1.0857035604471863
+  }
+}
