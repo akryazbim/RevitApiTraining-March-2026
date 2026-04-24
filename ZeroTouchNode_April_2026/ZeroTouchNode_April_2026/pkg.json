@@ -1,0 +1,23 @@
+{
+  "license": "MIT",
+  "file_hash": null,
+  "name": "BIMera",
+  "version": "1.0.0",
+  "description": "A collection of Zero Touch Dynamo nodes created BY BIMera.",
+  "group": "",
+  "keywords": [ "ZeroTouch", "dynamo" ],
+  "dependencies": [],
+  "host_dependencies": [
+    "Revit"
+  ],
+  "contents": "Zero Touch Nodes - A collection of simple Zero Touch Nodes Dynamo nodes.",
+  "engine_version": "3.6.0.9395",
+  "engine": "dynamo",
+  "engine_metadata": "",
+  "site_url": "",
+  "repository_url": "",
+  "contains_binaries": true,
+  "node_libraries": [
+    "ZeroTouchNode_April_2025, Version=1.0.0, Culture=neutral, PublicKeyToken=null"
+  ]
+} 

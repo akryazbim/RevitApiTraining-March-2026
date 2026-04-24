@@ -1,0 +1,12 @@
+C:\Users\Akryazz\source\repos\ZeroTouchNode_April_2026\ZeroTouchNode_April_2026\bin\Debug\net8.0\ZeroTouchNode_April_2026.deps.json
+C:\Users\Akryazz\source\repos\ZeroTouchNode_April_2026\ZeroTouchNode_April_2026\bin\Debug\net8.0\ZeroTouchNode_April_2026.dll
+C:\Users\Akryazz\source\repos\ZeroTouchNode_April_2026\ZeroTouchNode_April_2026\bin\Debug\net8.0\ZeroTouchNode_April_2026.pdb
+C:\Users\Akryazz\source\repos\ZeroTouchNode_April_2026\ZeroTouchNode_April_2026\obj\Debug\net8.0\ZeroTouchNode_April_2026.csproj.AssemblyReference.cache
+C:\Users\Akryazz\source\repos\ZeroTouchNode_April_2026\ZeroTouchNode_April_2026\obj\Debug\net8.0\ZeroTouchNode_April_2026.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Akryazz\source\repos\ZeroTouchNode_April_2026\ZeroTouchNode_April_2026\obj\Debug\net8.0\ZeroTouchNode_April_2026.AssemblyInfoInputs.cache
+C:\Users\Akryazz\source\repos\ZeroTouchNode_April_2026\ZeroTouchNode_April_2026\obj\Debug\net8.0\ZeroTouchNode_April_2026.AssemblyInfo.cs
+C:\Users\Akryazz\source\repos\ZeroTouchNode_April_2026\ZeroTouchNode_April_2026\obj\Debug\net8.0\ZeroTouchNode_April_2026.csproj.CoreCompileInputs.cache
+C:\Users\Akryazz\source\repos\ZeroTouchNode_April_2026\ZeroTouchNode_April_2026\obj\Debug\net8.0\ZeroTouchNode_April_2026.dll
+C:\Users\Akryazz\source\repos\ZeroTouchNode_April_2026\ZeroTouchNode_April_2026\obj\Debug\net8.0\refint\ZeroTouchNode_April_2026.dll
+C:\Users\Akryazz\source\repos\ZeroTouchNode_April_2026\ZeroTouchNode_April_2026\obj\Debug\net8.0\ZeroTouchNode_April_2026.pdb
+C:\Users\Akryazz\source\repos\ZeroTouchNode_April_2026\ZeroTouchNode_April_2026\obj\Debug\net8.0\ref\ZeroTouchNode_April_2026.dll

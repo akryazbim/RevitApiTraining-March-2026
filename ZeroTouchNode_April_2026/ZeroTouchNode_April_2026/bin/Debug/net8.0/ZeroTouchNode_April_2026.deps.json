@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "ZeroTouchNode_April_2026/1.0.0": {
+        "runtime": {
+          "ZeroTouchNode_April_2026.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "ZeroTouchNode_April_2026/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

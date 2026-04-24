@@ -1,0 +1,71 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Akryazz\\source\\repos\\ZeroTouchNode_April_2026\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{9B6E7E40-A0B1-4402-8C21-50BFFFAAE13F}|ZeroTouchNode_April_2026\\ZeroTouchNode_April_2026.csproj|c:\\users\\akryazz\\source\\repos\\zerotouchnode_april_2026\\zerotouchnode_april_2026\\revitinteraction.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9B6E7E40-A0B1-4402-8C21-50BFFFAAE13F}|ZeroTouchNode_April_2026\\ZeroTouchNode_April_2026.csproj|solutionrelative:zerotouchnode_april_2026\\revitinteraction.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9B6E7E40-A0B1-4402-8C21-50BFFFAAE13F}|ZeroTouchNode_April_2026\\ZeroTouchNode_April_2025.csproj|c:\\users\\akryazz\\source\\repos\\zerotouchnode_april_2026\\zerotouchnode_april_2026\\zerotouchnode_april_2025.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{9B6E7E40-A0B1-4402-8C21-50BFFFAAE13F}|ZeroTouchNode_April_2026\\ZeroTouchNode_April_2025.csproj|solutionrelative:zerotouchnode_april_2026\\zerotouchnode_april_2025.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9B6E7E40-A0B1-4402-8C21-50BFFFAAE13F}|ZeroTouchNode_April_2026\\ZeroTouchNode_April_2026.csproj|c:\\users\\akryazz\\source\\repos\\zerotouchnode_april_2026\\zerotouchnode_april_2026\\pkg.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{9B6E7E40-A0B1-4402-8C21-50BFFFAAE13F}|ZeroTouchNode_April_2026\\ZeroTouchNode_April_2026.csproj|solutionrelative:zerotouchnode_april_2026\\pkg.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "pkg.json",
+              "DocumentMoniker": "C:\\Users\\Akryazz\\source\\repos\\ZeroTouchNode_April_2026\\ZeroTouchNode_April_2026\\pkg.json",
+              "RelativeDocumentMoniker": "ZeroTouchNode_April_2026\\pkg.json",
+              "ToolTip": "C:\\Users\\Akryazz\\source\\repos\\ZeroTouchNode_April_2026\\ZeroTouchNode_April_2026\\pkg.json",
+              "RelativeToolTip": "ZeroTouchNode_April_2026\\pkg.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-04-24T15:30:15.862Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ZeroTouchNode_April_2025.csproj",
+              "DocumentMoniker": "C:\\Users\\Akryazz\\source\\repos\\ZeroTouchNode_April_2026\\ZeroTouchNode_April_2026\\ZeroTouchNode_April_2025.csproj",
+              "RelativeDocumentMoniker": "ZeroTouchNode_April_2026\\ZeroTouchNode_April_2025.csproj",
+              "ToolTip": "C:\\Users\\Akryazz\\source\\repos\\ZeroTouchNode_April_2026\\ZeroTouchNode_April_2026\\ZeroTouchNode_April_2025.csproj",
+              "RelativeToolTip": "ZeroTouchNode_April_2026\\ZeroTouchNode_April_2025.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAABCAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-04-24T15:27:27.488Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "RevitInteraction.cs",
+              "DocumentMoniker": "C:\\Users\\Akryazz\\source\\repos\\ZeroTouchNode_April_2026\\ZeroTouchNode_April_2026\\RevitInteraction.cs",
+              "RelativeDocumentMoniker": "ZeroTouchNode_April_2026\\RevitInteraction.cs",
+              "ToolTip": "C:\\Users\\Akryazz\\source\\repos\\ZeroTouchNode_April_2026\\ZeroTouchNode_April_2026\\RevitInteraction.cs",
+              "RelativeToolTip": "ZeroTouchNode_April_2026\\RevitInteraction.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-24T15:15:42.348Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

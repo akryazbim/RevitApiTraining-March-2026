@@ -1,0 +1,60 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="ProtoGeometry">
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2025\AddIns\DynamoForRevit\ProtoGeometry.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPI">
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2025\RevitAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI">
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2025\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitNodes">
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2025\AddIns\DynamoForRevit\Revit\RevitNodes.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitServices">
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2025\AddIns\DynamoForRevit\Revit\RevitServices.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="Build">
+		<!-- Copy the package to the Dynamo package root directory -->
+		<GetAssemblyIdentity AssemblyFiles="$(OutDir)$(TargetName).dll">
+			<Output TaskParameter="Assemblies" ItemName="AssemblyInfo" />
+		</GetAssemblyIdentity>
+		<ItemGroup>
+			<SourceDlls Include="$(TargetDir)*.dll" />
+			<SourcePdbs Include="$(TargetDir)*.pdb" />
+			<SourceXmls Include="$(TargetDir)*.xml" />
+			<SourcePkg Include="pkg.json" />
+		</ItemGroup>
+		<PropertyGroup>
+			<!-- Use MSBuildProjectName instead of ProjectName -->
+			<DynamoPackageRoot>$(AppData)\Dynamo\Dynamo Revit\3.3\packages\$(MSBuildProjectName)</DynamoPackageRoot>
+			<DynamoBin>$(DynamoPackageRoot)\bin\</DynamoBin>
+		</PropertyGroup>
+		<!-- Remove existing bin and recreate to ensure clean copy -->
+		<RemoveDir Directories="$(DynamoBin)" Condition="Exists('$(DynamoBin)')" />
+		<MakeDir Directories="$(DynamoBin)" />
+		<!-- Copy files, skip unchanged to speed up incremental builds -->
+		<Copy SourceFiles="@(SourceDlls)" DestinationFolder="$(DynamoBin)" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="@(SourcePdbs)" DestinationFolder="$(DynamoBin)" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="@(SourceXmls)" DestinationFolder="$(DynamoBin)" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="@(SourcePkg)" DestinationFolder="$(DynamoPackageRoot)" SkipUnchangedFiles="true" />
+	</Target>
+	
+
+</Project>
