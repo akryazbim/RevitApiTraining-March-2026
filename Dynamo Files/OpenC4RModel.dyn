@@ -1,0 +1,161 @@
+{
+  "Uuid": "c523f5a1-df1c-4b0d-91fc-38f275f5f656",
+  "IsCustomNode": false,
+  "Description": "",
+  "Name": "OpenC4RModel",
+  "ElementResolver": {
+    "ResolutionMap": {}
+  },
+  "Inputs": [],
+  "Outputs": [],
+  "Nodes": [
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "Code": "# Dynamo CPython3 — Get ACC Project ID and Model (Item) ID\r\n# ─────────────────────────────────────────────────────────\r\n# Inputs (wire String nodes in Dynamo):\r\n#   IN[0]  3-legged OAuth token\r\n#   IN[1]  Hub name          e.g. \"Akryaz\"\r\n#   IN[2]  Project name      e.g. \"Construction : Sample Project - Seaport Civic Center\"\r\n#   IN[3]  File path in ACC  e.g. \"Project Files/Models/CloudeModelTest.rvt\"\r\n#\r\n# Outputs:\r\n#   OUT[0]  Project ID\r\n#   OUT[1]  Model (Item) ID\r\n\r\nimport json\r\nimport urllib.request\r\nimport urllib.parse\r\nimport urllib.error\r\n\r\nfrom System import Guid\r\n\r\n# IN is injected by Dynamo at runtime; fallback values let the script run standalone\r\n_in = IN if \"IN\" in dir() else [  # type: ignore[name-defined]\r\n    \"your_3legged_token\",\r\n    \"Akryaz\",\r\n    \"Construction : Sample Project - Seaport Civic Center\",\r\n    \"Project Files/Models/CloudeModelTest.rvt\",\r\n]\r\nTOKEN        = \"eyJhbGciOiJSUzI1NiIsImtpZCI6IlZiakZvUzhQU3lYODQyMV95dndvRUdRdFJEa19SUzI1NiIsInBpLmF0bSI6ImFzc2MifQ.eyJzY29wZSI6WyJkYXRhOnJlYWQiLCJkYXRhOndyaXRlIiwiYnVja2V0OnJlYWQiLCJidWNrZXQ6Y3JlYXRlIiwiYWNjb3VudDpyZWFkIl0sImNsaWVudF9pZCI6IjNzbXlqdDBXbVM3TFdTS01Gd1B5dTVGNUxsYXJLR21rTEdQT2FyUWM0Ym1ybmdiZyIsImlzcyI6Imh0dHBzOi8vZGV2ZWxvcGVyLmFwaS5hdXRvZGVzay5jb20iLCJhdWQiOiJodHRwczovL2F1dG9kZXNrLmNvbSIsImp0aSI6ImROWUtjUFhxaG9tSUw5MDNzNVNWWUwwaGozVEdtZ3lkbkRvMDFCRVFYOWQ3REt2NUFhbzc4dXR3S2Z4b2J1cE8iLCJ1c2VyaWQiOiJUVUs5TEZCQVhHQVoiLCJleHAiOjE3Nzc1NjY1NTJ9.TEFznAnG2CXChvmj45DgZ0mhhotWop5IiEBdVDbRcvIjlN_xQY2K8sPpITf4kdcj1a0SaemFY8aSGrl36__OxMN4akuI2p3tKY1HxQGap1Ly16ct9_Ko2Ga4DmC9Z73teI3sDb0uusm2_THzNPIaxpINc_HG9I1YgnSttlEPGeFoB5vwgV2-AXaSWzY2kugklQAoyz719JZ-2zYRbYccHa18jKGog9vxc0qF_Xm0t8rPHND1QePRGvnSvbNdJmQ77sB8e1dX5_ron0tzUooMZd1HvZWtGEVwuSmUyr7vYbR_G5u-d-swupdHt5RuQbW3DZ4v56gxFzkEMCIWcBZISQ\"\r\nHUB_NAME     = \"Akryaz\"\r\nPROJECT_NAME = \"Construction : Sample Project - Seaport Civic Center\"\r\nFILE_PATH    = \"Project Files/Models/CloudeModelTest.rvt\"\r\n\r\nBASE_URL = \"https://developer.api.autodesk.com\"\r\n\r\n\r\n# ── HTTP helper ────────────────────────────────────────────────────────────────\r\ndef api_get(endpoint, params=None):\r\n    url = BASE_URL + endpoint\r\n    if params:\r\n        url += \"?\" + urllib.parse.urlencode(params)\r\n    req = urllib.request.Request(url, headers={\"Authorization\": \"Bearer \" + TOKEN})\r\n    with urllib.request.urlopen(req) as resp:\r\n        return json.loads(resp.read().decode())[\"data\"]\r\n\r\n\r\n# ── Paginated folder contents ──────────────────────────────────────────────────\r\ndef get_folder_contents(project_id, folder_id):\r\n    url    = \"{}/data/v1/projects/{}/folders/{}/contents?page[limit]=200\".format(\r\n             BASE_URL, project_id, folder_id)\r\n    items  = []\r\n    while url:\r\n        req = urllib.request.Request(url, headers={\"Authorization\": \"Bearer \" + TOKEN})\r\n        with urllib.request.urlopen(req) as resp:\r\n            body   = json.loads(resp.read().decode())\r\n        items += body[\"data\"]\r\n        url    = body.get(\"links\", {}).get(\"next\", {}).get(\"href\")\r\n    return items\r\n\r\n\r\n# ── Navigate folder tree ───────────────────────────────────────────────────────\r\ndef find_item(hub_id, project_id, file_path):\r\n    parts       = file_path.strip(\"/\").split(\"/\")\r\n    target_name = parts[-1]\r\n    folder_path = parts[:-1]\r\n\r\n    top_folders = api_get(\"/project/v1/hubs/{}/projects/{}/topFolders\".format(hub_id, project_id))\r\n    current     = next((f for f in top_folders if f[\"attributes\"][\"name\"] == folder_path[0]), None)\r\n    if not current:\r\n        raise LookupError(\"Top-level folder not found: '{}'\".format(folder_path[0]))\r\n\r\n    for sub_name in folder_path[1:]:\r\n        contents = get_folder_contents(project_id, current[\"id\"])\r\n        current  = next(\r\n            (x for x in contents if x[\"type\"] == \"folders\" and x[\"attributes\"][\"name\"] == sub_name),\r\n            None,\r\n        )\r\n        if not current:\r\n            raise LookupError(\"Sub-folder not found: '{}'\".format(sub_name))\r\n\r\n    contents = get_folder_contents(project_id, current[\"id\"])\r\n    item     = next(\r\n        (x for x in contents if x[\"type\"] == \"items\" and x[\"attributes\"][\"displayName\"] == target_name),\r\n        None,\r\n    )\r\n    if not item:\r\n        raise LookupError(\"File not found: '{}'\".format(target_name))\r\n    return item\r\n\r\n\r\n# ── Main logic ─────────────────────────────────────────────────────────────────\r\ntry:\r\n    # Find hub\r\n    hubs   = api_get(\"/project/v1/hubs\")\r\n    hub    = next((h for h in hubs if h[\"attributes\"][\"name\"] == HUB_NAME), None)\r\n    if not hub:\r\n        raise LookupError(\"Hub '{}' not found\".format(HUB_NAME))\r\n    hub_id = hub[\"id\"]\r\n\r\n    # Find project\r\n    projects   = api_get(\"/project/v1/hubs/{}/projects\".format(hub_id))\r\n    project    = next((p for p in projects if p[\"attributes\"][\"name\"] == PROJECT_NAME), None)\r\n    if not project:\r\n        raise LookupError(\"Project '{}' not found\".format(PROJECT_NAME))\r\n    project_id = project[\"id\"]\r\n\r\n    # Find file item\r\n    item    = find_item(hub_id, project_id, FILE_PATH)\r\n    item_id = item[\"id\"]\r\n    \r\n    versions       = api_get(\"/data/v1/projects/{}/items/{}/versions\".format(project_id, item_id))\r\n    ext_data       = versions[0][\"attributes\"][\"extension\"][\"data\"]\r\n    model_guid_str = ext_data[\"modelGuid\"]\r\n    proj_guid_str  = ext_data.get(\"projectGuid\", project_id[2:])\r\n\r\n    OUT = [Guid(proj_guid_str), Guid(model_guid_str)]\r\n\r\nexcept urllib.error.HTTPError as e:\r\n    OUT = [\"HTTP Error {}: {}\".format(e.code, e.reason), None]\r\nexcept LookupError as e:\r\n    OUT = [str(e), None]\r\nexcept Exception as e:\r\n    OUT = [\"Error: \" + str(e), None]\r\n",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "fe93cb5007cd4f45a78a48841d41c09c",
+      "NodeType": "PythonScriptNode",
+      "Inputs": [
+        {
+          "Id": "00e3fbac0c274e25adad406f33cfdd87",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "6030ba7888924a278be1f01a8c1a367d",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    },
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "Code": "import clr\r\n\r\nimport sys\r\nsys.path.append('C:\\Program Files (x86)\\IronPython 2.7\\Lib')\r\n\r\nimport System\r\nfrom System.Collections.Generic import *\r\n\r\nclr.AddReference('ProtoGeometry')\r\nfrom Autodesk.DesignScript.Geometry import *\r\n\r\nclr.AddReference(\"RevitNodes\")\r\nimport Revit\r\nclr.ImportExtensions(Revit.Elements)\r\nclr.ImportExtensions(Revit.GeometryConversion)\r\nclr.AddReference(\"RevitServices\")\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager \r\nfrom RevitServices.Transactions import TransactionManager \r\n\r\nclr.AddReference(\"RevitAPI\")\r\nclr.AddReference(\"RevitAPIUI\")\r\n\r\nimport Autodesk \r\nfrom Autodesk.Revit.DB import *\r\nfrom Autodesk.Revit.UI import *\r\n\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\nuiapp = DocumentManager.Instance.CurrentUIApplication \r\napp = uiapp.Application \r\nuidoc = uiapp.ActiveUIDocument\r\n\r\ndef tolist(obj1):\r\n\tif isinstance(obj1,(list, tuple, set)): return obj1\r\n\telse: return [obj1]\r\n\r\n#Preparing input from dynamo to revit\r\nids = UnwrapElement(IN[0])\r\n\r\nprojectId = ids[0]\r\nmodelId = ids[1]\r\n\r\n\r\npath = ModelPathUtils.ConvertCloudGUIDsToCloudPath(\"US\", projectId, modelId)\r\n\r\n\"\"\"\r\npublic Document OpenDocumentFile(\r\n    ModelPath modelPath,\r\n    OpenOptions openOptions\r\n)\"\"\"\r\n\r\nopt = OpenOptions()\r\nopt.Audit = False\r\nopt.DetachFromCentralOption = DetachFromCentralOption.DoNotDetach\r\n\r\n\r\ncloudDoc = app.OpenDocumentFile(path, opt)\r\n\r\n\r\nfloors = FilteredElementCollector(cloudDoc).OfClass(Floor).ToElements()\r\n\r\nvals = []\r\n\r\nfor floor in floors:\r\n    perimeter = floor.LookupParameter(\"Perimeter\")\r\n    paramValue = perimeter.AsDouble()*304.8\r\n    vals.append(paramValue)\r\n\r\n\r\nTransactionManager.Instance.EnsureInTransaction(doc)\r\n\r\nTransactionManager.Instance.TransactionTaskDone()\r\n\r\nOUT = vals",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "4c578cb9a59b4d51977bff953c09de32",
+      "NodeType": "PythonScriptNode",
+      "Inputs": [
+        {
+          "Id": "5ddb9ffceee442cb86be4a3d4c5e1043",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "fdd8dda498d84198b1f7d4a91663f2cf",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    }
+  ],
+  "Connectors": [
+    {
+      "Start": "6030ba7888924a278be1f01a8c1a367d",
+      "End": "5ddb9ffceee442cb86be4a3d4c5e1043",
+      "Id": "a3fe77be40f04f00b61bb05fd4a5b2c3",
+      "IsHidden": "False"
+    }
+  ],
+  "Dependencies": [],
+  "NodeLibraryDependencies": [],
+  "EnableLegacyPolyCurveBehavior": true,
+  "Thumbnail": "",
+  "GraphDocumentationURL": null,
+  "ExtensionWorkspaceData": [
+    {
+      "ExtensionGuid": "28992e1d-abb9-417f-8b1b-05e053bee670",
+      "Name": "Properties",
+      "Version": "3.3",
+      "Data": {}
+    },
+    {
+      "ExtensionGuid": "DFBD9CC0-DB40-457A-939E-8C8555555A9D",
+      "Name": "Generative Design",
+      "Version": "8.2",
+      "Data": {}
+    }
+  ],
+  "Author": "",
+  "Linting": {
+    "activeLinter": "None",
+    "activeLinterId": "7b75fb44-43fd-4631-a878-29f4d5d8399a",
+    "warningCount": 0,
+    "errorCount": 0
+  },
+  "Bindings": [],
+  "View": {
+    "Dynamo": {
+      "ScaleFactor": 1.0,
+      "HasRunWithoutCrash": true,
+      "IsVisibleInDynamoLibrary": true,
+      "Version": "3.3.0.6316",
+      "RunType": "Manual",
+      "RunPeriod": "1000"
+    },
+    "Camera": {
+      "Name": "_Background Preview",
+      "EyeX": -17.0,
+      "EyeY": 24.0,
+      "EyeZ": 50.0,
+      "LookX": 12.0,
+      "LookY": -13.0,
+      "LookZ": -58.0,
+      "UpX": 0.0,
+      "UpY": 1.0,
+      "UpZ": 0.0
+    },
+    "ConnectorPins": [],
+    "NodeViews": [
+      {
+        "Id": "fe93cb5007cd4f45a78a48841d41c09c",
+        "Name": "Get Project and Model GUIDs",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 67.61327686454081,
+        "Y": 338.67291463260904
+      },
+      {
+        "Id": "4c578cb9a59b4d51977bff953c09de32",
+        "Name": "Python Script",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 430.8084653692837,
+        "Y": 359.7301717229394
+      }
+    ],
+    "Annotations": [],
+    "X": -607.93137552117,
+    "Y": -525.6113712455333,
+    "Zoom": 2.0457150447910966
+  }
+}

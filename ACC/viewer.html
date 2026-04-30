@@ -1,0 +1,31 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/viewer3D.min.js"></script>
+  <link rel="stylesheet" href="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/style.min.css">
+  <style>
+    html, body { margin: 0; height: 100%; }
+    #viewer { width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+  <div id="viewer"></div>
+  <script>
+    const options = {
+      env: 'AutodeskProduction',
+      accessToken: 'eyJhbGciOiJSUzI1NiIsImtpZCI6IlZiakZvUzhQU3lYODQyMV95dndvRUdRdFJEa19SUzI1NiIsInBpLmF0bSI6ImFzc2MifQ.eyJzY29wZSI6WyJkYXRhOnJlYWQiLCJkYXRhOndyaXRlIiwiYnVja2V0OmNyZWF0ZSIsImJ1Y2tldDpyZWFkIl0sImNsaWVudF9pZCI6IjNzbXlqdDBXbVM3TFdTS01Gd1B5dTVGNUxsYXJLR21rTEdQT2FyUWM0Ym1ybmdiZyIsImlzcyI6Imh0dHBzOi8vZGV2ZWxvcGVyLmFwaS5hdXRvZGVzay5jb20iLCJhdWQiOiJodHRwczovL2F1dG9kZXNrLmNvbSIsImp0aSI6IkdKYmlkc0FvRVJzeGU5TXNMNUJ2dThicGRJNTFacDlldExGaTdGSXVXbmQxZVVqVDB6QzF1VGxlSk4zckVwNDUiLCJleHAiOjE3Nzc0ODMwOTd9.ZugaGaHHFGndQYb7BDYZeW5uFS2ErC5Z-tpzUlynhX5Phjdpjthdqe3pcwmrUdEivLdoIGCgPqA68NhErS2yomiIPlOGLApkCCNJs_oGsRs-Z5NLb5TzDdMOwBCn-jZiYhX5y-63qTDC-uCrxL2JiJJqFxtJqRYieFdVJH-XpkMeydvnZq0q_0He0BeYj9wybAxzZvmy2Jtn1lPJG_w0_L652cmWZNo2LXGNuwQbDiBUP--xrT1wlPBMhtsmnKoCRRFfqlm8oICKq2DU1bQTJTAn0veYbYRA1w_Z5xk5ul4HtoKNojaG7bdUbkSXJIU0_99zrzlKFfJOOr6Dp4M0NA'
+    };
+
+    Autodesk.Viewing.Initializer(options, function () {
+      const viewer = new Autodesk.Viewing.GuiViewer3D(document.getElementById('viewer'));
+      viewer.start();
+
+      Autodesk.Viewing.Document.load('urn:dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6YXBzLWRlbW8tYnVja2V0LWFwcmlsLTIwMjYtdGVzdC9UZXN0UHJvamVjdC5ydnQ=', function (doc) {
+        const defaultModel = doc.getRoot().getDefaultGeometry();
+        viewer.loadDocumentNode(doc, defaultModel);
+      });
+    });
+  </script>
+</body>
+</html>
