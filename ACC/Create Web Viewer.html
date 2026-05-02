@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>APS Viewer Demo</title>
+
+  <script src="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/viewer3D.min.js"></script>
+  <link rel="stylesheet" href="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/style.min.css">
+
+  <style>
+    html, body { margin: 0; height: 100%; }
+    #viewer { width: 100%; height: 100%; }
+  </style>
+</head>
+
+<body>
+  <div id="viewer"></div>
+
+  <script>
+    const urn = "dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6dHJhbnMtYnVja2V0LWtleS1ncHQtNS9UZXN0UHJvamVjdC5ydnQ";
+
+    // 👉 PASTE TOKEN HERE (from Postman)
+    const accessToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6IlZiakZvUzhQU3lYODQyMV95dndvRUdRdFJEa19SUzI1NiIsInBpLmF0bSI6ImFzc2MifQ.eyJzY29wZSI6WyJkYXRhOnJlYWQiLCJkYXRhOndyaXRlIiwiZGF0YTpjcmVhdGUiLCJidWNrZXQ6cmVhZCIsImJ1Y2tldDpjcmVhdGUiLCJhY2NvdW50OnJlYWQiXSwiY2xpZW50X2lkIjoiM3NteWp0MFdtUzdMV1NLTUZ3UHl1NUY1TGxhcktHbWtMR1BPYXJRYzRibXJuZ2JnIiwiaXNzIjoiaHR0cHM6Ly9kZXZlbG9wZXIuYXBpLmF1dG9kZXNrLmNvbSIsImF1ZCI6Imh0dHBzOi8vYXV0b2Rlc2suY29tIiwianRpIjoiUlgzWFg5U1RGYXFuZEN4MEpjRVM5SnlIVGpBMnhLNWoweVh4RFZZUjZhWk91YzBCR3d4dnVFdmRYNVU3ZHI0ZiIsImV4cCI6MTc3NzQwMjY2OX0.foVjwidLssT3--nxOoXwF1_Hyy128rSyZ9mxXE3ODsFcgN5iUvjtiU8SaaKKMsGJhYbS-s0zwJOpulcWR01Ekv3DF3O-f3Yyr-yYx9-hKa7_M5iB8e0lbhoGGu83FPeaRiBok13uGwav-R0Yml6cQtT-JL5OBezniUPvNLJbXFd8Ui4u3FXN-BsK32nuM62k9x_5nOupFeQa5zDLXXIAELkhDUUv9f9_J39nxR6KknU82QqxLIT7qOLnhPwdUZpF2QovkpuVtFOnTVLyAo0Z11_0EFH5dS2-_QzSVyIjVI2IOJo93jJm5Qfg-jrasJmCUokq4yuSOnUeng-byHUauw";
+
+    const options = {
+      env: "AutodeskProduction",
+      accessToken: accessToken
+    };
+
+    Autodesk.Viewing.Initializer(options, function () {
+
+      const viewer = new Autodesk.Viewing.GuiViewer3D(
+        document.getElementById("viewer")
+      );
+
+      viewer.start();
+
+      Autodesk.Viewing.Document.load("urn:" + urn, function (doc) {
+
+        const defaultModel = doc.getRoot().getDefaultGeometry();
+        viewer.loadDocumentNode(doc, defaultModel);
+
+      }, function (err) {
+        console.error("Error loading model:", err);
+      });
+
+    });
+  </script>
+</body>
+</html>
