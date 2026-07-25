@@ -8,7 +8,7 @@ else:
     print("Fail")
 
 
-marks = 100
+marks = 90
 
 if marks >=100:
     print("your passed with Grade A")
