@@ -10,7 +10,7 @@ else:
 <<<<<<< HEAD
 =======
 
-marks = 90
+marks = 100
 
 if marks >=100:
     print("your passed with Grade A")
