@@ -7,8 +7,7 @@ if ductLength >3000 and ductLength <4000:
 else:
     print("Fail")
 
-<<<<<<< HEAD
-=======
+
 
 marks = 100
 
@@ -20,4 +19,4 @@ elif marks >= 50:
     print("your just passed with average marks")
 else:
     print("your failed")
->>>>>>> 083c840ec0f295d291a91a42a3dcda0ffcb2df18
+
