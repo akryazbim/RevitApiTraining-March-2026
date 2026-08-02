@@ -38,7 +38,7 @@ def tolist(obj1):
         return [obj1]
 
 #Preparing input from dynamo to revit
-#element = UnwrapElement(IN[0])
+element = UnwrapElement(IN[0])
 
 #Do some action in a Transaction
 
